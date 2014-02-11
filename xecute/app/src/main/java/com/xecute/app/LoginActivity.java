@@ -1,65 +1,53 @@
 package com.xecute.app;
 
-import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 
-public class LoginActivity extends Activity {
+
+public class LoginActivity extends FragmentActivity implements LoginFragment.LoginFragmentListener {
+    final private String LOGIN = "LOGIN ACTIVITY";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
-        }
+
+
+        LoginFragment loginFragment = new LoginFragment();
+
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, loginFragment).commit();
     }
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.login, menu);
-        return true;
-    }
+    public void onButtonSelected(View v) {
+        switch (v.getId()) {
+            case R.id.loginBtn:
+                Log.i(LOGIN, "Login Btn pressed!");
+                break;
+            case R.id.signupBtn:
+                Log.i(LOGIN, "SignUp Btn pressed!");
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+                SignupFragment signupFragment = new SignupFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, signupFragment)
+                        .addToBackStack(null).commit();
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
+                break;
+            case R.id.resetBtn:
+                Log.i(LOGIN, "Reset Btn pressed!");
 
-        public PlaceholderFragment() {
-        }
+                ResetFragment resetFragment = new ResetFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, resetFragment)
+                        .addToBackStack(null).commit();
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_login, container, false);
-            return rootView;
+                break;
         }
     }
-
 }

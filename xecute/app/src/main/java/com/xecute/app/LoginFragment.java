@@ -24,7 +24,6 @@ import android.widget.LinearLayout;
  * Created by aaronburke on 2/11/14.
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
-    final private String LOGIN = "LOGIN ACTIVITY";
     LoginFragmentListener mCallback;
 
     public interface LoginFragmentListener {
@@ -39,9 +38,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         Button loginBtn = (Button) loginView.findViewById(R.id.loginBtn);
         loginBtn.setOnClickListener(this);
-        Button resetBtn = (Button) loginView.findViewById(R.id.resetBtn);
+        Button resetBtn = (Button) loginView.findViewById(R.id.goToResetBtn);
         resetBtn.setOnClickListener(this);
-        Button signupBtn = (Button) loginView.findViewById(R.id.signupBtn);
+        Button signupBtn = (Button) loginView.findViewById(R.id.goToSignupBtn);
         signupBtn.setOnClickListener(this);
 
 
@@ -58,26 +57,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             mCallback = (LoginFragmentListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener");
+                    + " must implement LoginFragmentListener");
         }
     }
 
     @Override
     public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.loginBtn:
-//                Log.i(LOGIN, "Login Btn pressed!");
-//                break;
-//            case R.id.signupBtn:
-//                Log.i(LOGIN, "SignUp Btn pressed!");
-                mCallback.onButtonSelected(v);
-//                SignupFragment fragment = new SignupFragment();
-//                getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment);
-//                break;
-//            case R.id.resetBtn:
-//                Log.i(LOGIN, "Reset Btn pressed!");
-//                break;
-//        }
+        mCallback.onButtonSelected(v);
 
     }
 

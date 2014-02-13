@@ -20,7 +20,6 @@
         android:duration="500"
         android:fromAlpha="0.25"
         android:interpolator="@android:anim/accelerate_interpolator"
-        android:repeatMode="reverse"
         android:startOffset="500"
         android:toAlpha="1.0" />
 </set>

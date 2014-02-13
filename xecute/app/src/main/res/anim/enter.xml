@@ -15,13 +15,11 @@
         android:fromXDelta="100%"
         android:toXDelta="0"
         android:interpolator="@android:anim/accelerate_decelerate_interpolator"
-        android:repeatMode="reverse"
         android:duration="@android:integer/config_mediumAnimTime"/>
     <alpha
         android:duration="500"
         android:fromAlpha="0.25"
         android:interpolator="@android:anim/accelerate_interpolator"
-        android:repeatMode="reverse"
         android:startOffset="500"
         android:toAlpha="1.0" />
 </set>

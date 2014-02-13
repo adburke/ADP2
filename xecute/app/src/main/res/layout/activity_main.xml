@@ -14,4 +14,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.xecute.app.MainActivity"
-    tools:ignore="MergeRootFrame" />
+    tools:ignore="MergeRootFrame" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:id="@+id/main_container"
+        android:layout_height="match_parent"/>
+
+    </FrameLayout>

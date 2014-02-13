@@ -14,9 +14,9 @@
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:id="@+id/fragment_container"
+        android:id="@+id/login_container"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="315dp"/>
+        android:layout_marginTop="325dp"/>
 
     </FrameLayout>

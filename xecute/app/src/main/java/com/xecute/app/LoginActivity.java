@@ -2,6 +2,7 @@ package com.xecute.app;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -35,12 +36,21 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
 
         Parse.initialize(mContext, "0168Opz62QUNZQq7KBoYpky76XHovSkbsic0CuaV", "geMyhc0Ni3HR5IX8uzpNt5dxklmOgVtfveIJDxNt" );
 
+        // Check for valid credentials to skip login
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(mContext, MainActivity.class);
+            startActivity(intent);
+            // Removes activity from the stack so we can not navigate back to the login screen
+            finish();
+        }
+
         FragmentManager fragManager = getSupportFragmentManager();
         FragmentTransaction fragTrans = fragManager.beginTransaction();
         fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
 
         loginFragment = new LoginFragment();
-        fragTrans.add(R.id.fragment_container, loginFragment).commit();
+        fragTrans.add(R.id.login_container, loginFragment).commit();
 
     }
 
@@ -60,7 +70,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                 SignupFragment signupFragment = new SignupFragment();
                 getSupportFragmentManager().beginTransaction()
                         .setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit)
-                        .replace(R.id.fragment_container, signupFragment)
+                        .replace(R.id.login_container, signupFragment)
                         .addToBackStack(null).commit();
                 break;
 
@@ -70,7 +80,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                 ResetFragment resetFragment = new ResetFragment();
                 getSupportFragmentManager().beginTransaction()
                         .setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit)
-                        .replace(R.id.fragment_container, resetFragment)
+                        .replace(R.id.login_container, resetFragment)
                         .addToBackStack(null).commit();
                 break;
 
@@ -102,6 +112,11 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                 public void done(ParseUser user, ParseException e) {
                     if (user != null) {
                         Log.i(LOGIN, "Log In Successful!");
+
+                        Intent intent = new Intent(mContext, MainActivity.class);
+                        startActivity(intent);
+                        // Removes activity from the stack so we can not navigate back to the login screen
+                        finish();
 
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -175,7 +190,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                         if (e == null) {
                             // An email was successfully sent with reset instructions.
                             Log.i(LOGIN, "Reset password successful.");
-                            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,loginFragment).commit();
+                            getSupportFragmentManager().beginTransaction().replace(R.id.login_container,loginFragment).commit();
 
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);

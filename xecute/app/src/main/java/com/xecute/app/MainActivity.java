@@ -10,44 +10,50 @@
 
 package com.xecute.app;
 
-import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
+
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-    }
+        FragmentManager fragManager = getSupportFragmentManager();
+        FragmentTransaction fragTrans = fragManager.beginTransaction();
+        fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
 
+        ProjectsFragment projectsFragment = new ProjectsFragment();
+        fragTrans.add(R.id.main_container, projectsFragment).commit();
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                Log.i("MAIN", "Log Out Selected.");
+                return true;
+
+            case R.id.action_add_project:
+            Log.i("MAIN", "New Project Selected.");
             return true;
+
+            case R.id.action_filter_project:
+                Log.i("MAIN", "Filter Project Selected.");
+                return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 

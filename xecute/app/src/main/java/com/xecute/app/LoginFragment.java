@@ -13,7 +13,6 @@ package com.xecute.app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        LinearLayout loginView = (LinearLayout) inflater.inflate(R.layout.login, container, false);
+        LinearLayout loginView = (LinearLayout) inflater.inflate(R.layout.fragment_login, container, false);
 
         Button loginBtn = (Button) loginView.findViewById(R.id.loginBtn);
         loginBtn.setOnClickListener(this);

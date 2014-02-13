@@ -12,9 +12,7 @@ import android.widget.EditText;
 
 import com.parse.LogInCallback;
 import com.parse.Parse;
-import com.parse.ParseAnalytics;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 import com.parse.SignUpCallback;
@@ -104,6 +102,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                 public void done(ParseUser user, ParseException e) {
                     if (user != null) {
                         Log.i(LOGIN, "Log In Successful!");
+
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                         builder.setMessage("Log In Failed with Error: " + e.getMessage()).setTitle("Alert");

@@ -34,7 +34,7 @@ public class ResetFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        LinearLayout resetView = (LinearLayout) inflater.inflate(R.layout.reset_password, container, false);
+        LinearLayout resetView = (LinearLayout) inflater.inflate(R.layout.fragment_reset, container, false);
 
         Button resetBtn = (Button) resetView.findViewById(R.id.resetBtn);
         resetBtn.setOnClickListener(this);

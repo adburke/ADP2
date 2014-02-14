@@ -136,8 +136,8 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
         EditText userNameInput = (EditText) findViewById(R.id.signupEmail);
         EditText passwordInput = (EditText) findViewById(R.id.signupPassword);
         EditText confirmPassInput = (EditText) findViewById(R.id.signupConfPassword);
-        String userName = userNameInput.getText().toString();
-        String password = passwordInput.getText().toString();
+        final String userName = userNameInput.getText().toString();
+        final String password = passwordInput.getText().toString();
         String confirmPassword = confirmPassInput.getText().toString();
 
         Log.i(LOGIN, "email= " + userName + " Pass= " + password + " ConfPass= " + confirmPassword);
@@ -162,6 +162,26 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                 public void done(ParseException e) {
                     if (e == null) {
                         Log.i(LOGIN, "Sign up successful!");
+
+                        ParseUser.logInInBackground(userName, password, new LogInCallback() {
+                            public void done(ParseUser user, ParseException e) {
+                                if (user != null) {
+                                    Log.i(LOGIN, "Log In Successful!");
+
+                                    Intent intent = new Intent(mContext, MainActivity.class);
+                                    startActivity(intent);
+                                    // Removes activity from the stack so we can not navigate back to the login screen
+                                    finish();
+
+                                } else {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                                    builder.setMessage("Log In Failed with Error: " + e.getMessage()).setTitle("Alert");
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                }
+                            }
+                        });
+
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                         builder.setMessage("Sign Up Failed with Error: " + e.getMessage()).setTitle("Alert");

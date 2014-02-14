@@ -23,6 +23,8 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
             android:name="com.xecute.app.MainActivity">
         </activity>
     </application>

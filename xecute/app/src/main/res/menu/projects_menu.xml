@@ -14,11 +14,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.xecute.app.ProjectsFragment" >
 
-    <item android:id="@+id/action_logout"
-        android:title="@string/action_logout"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
-
     <item android:id="@+id/action_add_project"
         android:showAsAction="always"
         android:icon="@drawable/ic_action_new"

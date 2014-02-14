@@ -6,6 +6,21 @@
 
     <string name="action_logout">Log Out</string>
     <string name="action_new_project">New Project</string>
-    <string name="action_filter_project">Filter</string>
+    <string name="action_filter_project">Filter Projects</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Navigation Array -->
+    <string-array name="action_list">
+        <item>Projects</item>
+        <item>My Tasks</item>
+    </string-array>
+
+    <!-- Projects Filter Array -->
+    <string-array name="project_filters">
+        <item>All</item>
+        <item>Open</item>
+        <item>Completed</item>
+    </string-array>
 
 </resources>

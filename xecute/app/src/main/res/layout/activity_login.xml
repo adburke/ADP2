@@ -19,4 +19,21 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="325dp"/>
 
+    <ImageView
+        android:id="@+id/progressBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:alpha="0.5"
+        android:visibility="invisible"/>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.Holo.Light.ProgressBar.Large"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="invisible"/>
+
     </FrameLayout>

@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.parse.LogInCallback;
 import com.parse.Parse;
@@ -26,6 +28,9 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
     Context mContext;
 
     LoginFragment loginFragment;
+
+    ProgressBar progressBar;
+    ImageView progressBg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +49,10 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
             // Removes activity from the stack so we can not navigate back to the login screen
             finish();
         }
+
+        progressBg = (ImageView) findViewById(R.id.progressBg);
+        progressBar = (ProgressBar) findViewById(R.id.progress);
+
 
         FragmentManager fragManager = getSupportFragmentManager();
         FragmentTransaction fragTrans = fragManager.beginTransaction();
@@ -65,7 +74,6 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
 
             case R.id.goToSignupBtn:
                 Log.i(LOGIN, "Go to signup!");
-
 
                 SignupFragment signupFragment = new SignupFragment();
                 getSupportFragmentManager().beginTransaction()
@@ -108,6 +116,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
             AlertDialog dialog = builder.create();
             dialog.show();
         } else {
+            ProgressBarActivation(true);
             ParseUser.logInInBackground(email, password, new LogInCallback() {
                 public void done(ParseUser user, ParseException e) {
                     if (user != null) {
@@ -124,6 +133,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                         AlertDialog dialog = builder.create();
                         dialog.show();
                         userPasswordInput.setText("");
+                        ProgressBarActivation(false);
                     }
                 }
             });
@@ -153,6 +163,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
             AlertDialog dialog = builder.create();
             dialog.show();
         } else {
+            ProgressBarActivation(true);
             ParseUser user = new ParseUser();
             user.setUsername(userName);
             user.setPassword(password);
@@ -178,6 +189,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                                     builder.setMessage("Log In Failed with Error: " + e.getMessage()).setTitle("Alert");
                                     AlertDialog dialog = builder.create();
                                     dialog.show();
+                                    ProgressBarActivation(false);
                                 }
                             }
                         });
@@ -187,6 +199,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                         builder.setMessage("Sign Up Failed with Error: " + e.getMessage()).setTitle("Alert");
                         AlertDialog dialog = builder.create();
                         dialog.show();
+                        ProgressBarActivation(false);
                     }
                 }
             });
@@ -194,6 +207,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
     }
 
     public void PasswordReset() {
+        ProgressBarActivation(true);
         Log.i(LOGIN, "Reset password fired.");
         final EditText resetEmailinput = (EditText) findViewById(R.id.resetEmail);
         String email = resetEmailinput.getText().toString();
@@ -203,6 +217,7 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
             builder.setMessage("Please Input Your Account Email Address").setTitle("Alert");
             AlertDialog dialog = builder.create();
             dialog.show();
+            ProgressBarActivation(false);
         } else {
             ParseUser.requestPasswordResetInBackground(email,
                 new RequestPasswordResetCallback() {
@@ -211,16 +226,28 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                             // An email was successfully sent with reset instructions.
                             Log.i(LOGIN, "Reset password successful.");
                             getSupportFragmentManager().beginTransaction().replace(R.id.login_container,loginFragment).commit();
-
+                            ProgressBarActivation(false);
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                             builder.setMessage("Reset Failed with Error: " + e.getMessage()).setTitle("Alert");
                             AlertDialog dialog = builder.create();
                             dialog.show();
                             resetEmailinput.setText("");
+                            ProgressBarActivation(false);
                         }
                     }
                 });
+        }
+
+    }
+
+    public void ProgressBarActivation(Boolean state) {
+        if (state) {
+            progressBg.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            progressBg.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
         }
 
     }

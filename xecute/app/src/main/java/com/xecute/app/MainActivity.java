@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -38,7 +39,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener {
+public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener, ProjectsFragment.ProjectsFragmentListener {
 
     Context mContext;
 
@@ -46,6 +47,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     Spinner navSpinner;
 
     ProjectsFragment projectsFragment;
+    ProjectListAdapter projectAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,6 +190,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
                                 }
                             } else {
                                 dialog.dismiss();
+                                updateProductList();
                             }
                         }
                     });
@@ -198,6 +201,17 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     }
 
     public void updateProductList() {
+        if (projectAdapter == null) {
+            projectAdapter = new ProjectListAdapter(mContext);
+        } else {
+            projectAdapter.loadObjects();
+        }
+        projectsFragment.setListAdapter(projectAdapter);
 
+    }
+
+    @Override
+    public void onItemSelected(ListView l, View v, int position) {
+        Log.i("Project List", "Selected item at position: " + position);
     }
 }

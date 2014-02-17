@@ -169,8 +169,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
                     newProject.put("projectName", projectName.getText().toString());
                     newProject.put("status", "New");
 
+                    ParseUser user = ParseUser.getCurrentUser();
+                    newProject.put("createdBy", user);
+
                     ParseObject color = ParseObject.createWithoutData("color", "ESp9ejI3iO");
-                    newProject.put( "color", color);
+                    newProject.put("color", color);
 
                     newProject.saveInBackground(new SaveCallback() {
                         public void done(ParseException e) {
@@ -189,6 +192,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
                 }
             }
         });
+
+    }
+
+    public void updateProductList() {
 
     }
 }

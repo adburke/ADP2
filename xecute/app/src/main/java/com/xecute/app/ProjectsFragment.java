@@ -10,6 +10,7 @@
 
 package com.xecute.app;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -22,11 +23,17 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseQueryAdapter;
+import com.parse.ParseUser;
+
 /**
  * Created by aaronburke on 2/12/14.
  */
 public class ProjectsFragment extends ListFragment {
 
+    Context mContext;
     ProjectListAdapter projectListAdapter;
     ListView projectList;
 
@@ -34,13 +41,14 @@ public class ProjectsFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        LinearLayout projectFragment = (LinearLayout) inflater.inflate(R.layout.fragment_projects, container, false);
-
         setHasOptionsMenu(true);
+        mContext = getActivity();
+
+        projectListAdapter = new ProjectListAdapter(mContext);
 
         setListAdapter(projectListAdapter);
 
-        return projectFragment;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override

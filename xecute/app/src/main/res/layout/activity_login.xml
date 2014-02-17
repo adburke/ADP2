@@ -10,7 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/xecute_bg"/>
+        android:background="@drawable/xecute_bg"
+        android:contentDescription="Xecute Logo"/>
 
     <FrameLayout
         android:layout_width="wrap_content"

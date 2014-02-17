@@ -10,6 +10,10 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
+    <!-- New Project Dialog -->
+    <string name="name_required">Name Required to Save!</string>
+    <string name="project_name_hint">Project Name</string>
+
     <!-- Navigation Array -->
     <string-array name="action_list">
         <item>Projects</item>

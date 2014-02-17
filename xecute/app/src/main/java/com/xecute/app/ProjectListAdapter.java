@@ -26,6 +26,10 @@ import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by aaronburke on 2/16/14.
  */
@@ -71,23 +75,16 @@ public class ProjectListAdapter extends ParseQueryAdapter<ParseObject> {
             }
         });
 
-//        if (colorFile != null) {
-//            colorImage.setParseFile(colorFile);
-//            colorImage.loadInBackground(new GetDataCallback() {
-//                @Override
-//                public void done(byte[] data, ParseException e) {
-//                    // nothing to do
-//                }
-//            });
-//        }
-
         TextView projectName = (TextView) v.findViewById(R.id.text1);
         projectName.setText(object.getString("projectName"));
         Log.i("QUERY", "ProjectName = " + object.getString("projectName"));
 
         TextView projectDate = (TextView) v.findViewById(R.id.created_date);
-        projectDate.setText((CharSequence) object.getDate("createdAt"));
-        Log.i("QUERY", "createdAt = " + object.getDate("createdAt"));
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        Date date = object.getCreatedAt();
+        String dateStr = df.format(date);
+        projectDate.setText(dateStr);
+        Log.i("QUERY", "createdAt = " + dateStr);
 
         TextView projectStatus = (TextView) v.findViewById(R.id.project_status);
         projectStatus.setText(object.getString("status"));

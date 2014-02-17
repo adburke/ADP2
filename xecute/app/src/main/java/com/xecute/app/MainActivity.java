@@ -45,6 +45,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     ActionBar actionBar;
     Spinner navSpinner;
 
+    ProjectsFragment projectsFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +68,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         FragmentTransaction fragTrans = fragManager.beginTransaction();
         fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
 
-        ProjectsFragment projectsFragment = new ProjectsFragment();
+        projectsFragment = new ProjectsFragment();
         fragTrans.add(R.id.main_container, projectsFragment).commit();
 
     }

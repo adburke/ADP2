@@ -9,6 +9,7 @@
     <string name="action_filter_project">Filter Projects</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
 
     <!-- New Project Dialog -->
     <string name="name_required">Name Required to Save!</string>

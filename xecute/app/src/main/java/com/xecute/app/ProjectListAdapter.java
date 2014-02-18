@@ -28,13 +28,16 @@ import com.parse.ParseUser;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by aaronburke on 2/16/14.
  */
 public class ProjectListAdapter extends ParseQueryAdapter<ParseObject> {
     Context mContext;
+
     public ProjectListAdapter(Context context) {
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
@@ -49,13 +52,17 @@ public class ProjectListAdapter extends ParseQueryAdapter<ParseObject> {
     }
 
     @Override
+    public boolean hasStableIds() {
+        return true;
+    }
+
+    @Override
     public View getItemView(ParseObject object, View v, ViewGroup parent) {
         Log.i("getItemView", "fired");
         if (v == null) {
             v = View.inflate(mContext, R.layout.projects_list, null);
             Log.i("PARSEADAPTER", "Layout Inflated");
         }
-
         super.getItemView(object, v, parent);
 
         final ParseImageView colorImage = (ParseImageView) v.findViewById(R.id.icon);

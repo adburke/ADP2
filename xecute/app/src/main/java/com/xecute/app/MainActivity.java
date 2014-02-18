@@ -25,6 +25,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -36,6 +39,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -95,26 +99,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
                 // Removes activity from the stack so we can not navigate back
                 finish();
                 return true;
-
-            case R.id.action_add_project:
-                Log.i("MAIN", "New Project Selected.");
-                createNewProject();
-                return true;
-
-            case R.id.action_filter_project:
-                Log.i("MAIN", "Filter Project Selected.");
-
-                AlertDialog.Builder filterBuilder = new AlertDialog.Builder(mContext);
-                filterBuilder.setTitle(R.string.action_filter_project)
-                        .setItems(R.array.project_filters, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
-                            }
-                        });
-                filterBuilder.create().show();
-
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -132,86 +116,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         return false;
     }
 
-    public void createNewProject() {
-        AlertDialog.Builder projectBuilder = new AlertDialog.Builder(this);
-        projectBuilder.setTitle(R.string.action_new_project);
-        // Get the layout inflater
-        LayoutInflater inflater = this.getLayoutInflater();
-        final View view = inflater.inflate(R.layout.create_project, null);
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        projectBuilder.setView(view)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                });
-        final AlertDialog dialog = projectBuilder.create();
-        dialog.show();
-
-        //noinspection ConstantConditions
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                final Boolean[] wantToCloseDialog = {false};
-
-                EditText projectName = (EditText) view.findViewById(R.id.project_name);
-                TextView errorMessage = (TextView) view.findViewById(R.id.project_name_error);
-                if (projectName.getText().toString().isEmpty()) {
-                    Log.i("Save Project", "Name is empty!");
-                    errorMessage.setVisibility(View.VISIBLE);
-
-                } else {
-                    final ParseObject newProject = new ParseObject("project");
-                    newProject.put("projectName", projectName.getText().toString());
-                    newProject.put("status", "New");
-
-                    ParseUser user = ParseUser.getCurrentUser();
-                    newProject.put("createdBy", user);
-
-                    ParseObject color = ParseObject.createWithoutData("color", "ESp9ejI3iO");
-                    newProject.put("color", color);
-
-                    newProject.saveInBackground(new SaveCallback() {
-                        public void done(ParseException e) {
-                            if (e != null) {
-                                Log.i("MAIN", "Error saving Project: " + e.getMessage());
-                                try {
-                                    newProject.delete();
-                                } catch (ParseException e1) {
-                                    e1.printStackTrace();
-                                }
-                            } else {
-                                dialog.dismiss();
-                                updateProductList();
-                            }
-                        }
-                    });
-                }
-            }
-        });
-
-    }
-
-    public void updateProductList() {
-        if (projectAdapter == null) {
-            projectAdapter = new ProjectListAdapter(mContext);
-        } else {
-            projectAdapter.loadObjects();
-        }
-        projectsFragment.setListAdapter(projectAdapter);
-
-    }
-
     @Override
     public void onItemSelected(ListView l, View v, int position) {
         Log.i("Project List", "Selected item at position: " + position);
     }
+
+
 }

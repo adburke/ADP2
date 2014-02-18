@@ -28,9 +28,7 @@ import com.parse.ParseUser;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * Created by aaronburke on 2/16/14.

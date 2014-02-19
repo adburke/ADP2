@@ -11,8 +11,12 @@
 package com.xecute.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.ActionMode;
@@ -43,6 +47,7 @@ import java.util.List;
 public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapter.OnQueryLoadListener<ParseObject> {
 
     Context mContext;
+    Bundle currentBundle;
     TaskListAdapter taskListAdapter;
 
     public TextView header;
@@ -85,10 +90,10 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
 
         getListView().getEmptyView().setVisibility(ListView.GONE);
 
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            String projectId = bundle.getString("projectId");
-            header.setText(bundle.getString("projectName"));
+        currentBundle = this.getArguments();
+        if (currentBundle != null) {
+            String projectId = currentBundle.getString("projectId");
+            header.setText(currentBundle.getString("projectName"));
 
             taskListAdapter = new TaskListAdapter(mContext, projectId);
             taskListAdapter.setAutoload(false);
@@ -156,6 +161,39 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
             mActionMode = null;
         }
     };
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.projects_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_add_project:
+                Log.i("MAIN", "New Project Selected.");
+                createNewTask();
+                return true;
+
+            case R.id.action_filter_project:
+                Log.i("MAIN", "Filter Project Selected.");
+
+                AlertDialog.Builder filterBuilder = new AlertDialog.Builder(mContext);
+                filterBuilder.setTitle(R.string.action_filter_project)
+                        .setItems(R.array.project_filters, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // The 'which' argument contains the index position
+                                // of the selected item
+                            }
+                        });
+                filterBuilder.create().show();
+
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -234,6 +272,27 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
         });
         animation.setDuration(300);
         row.startAnimation(animation);
+    }
+
+    void createNewTask(){
+        if (currentBundle != null) {
+            String projectId = currentBundle.getString("projectId");
+            String projectName = currentBundle.getString("projectName");
+            String colorId = currentBundle.getString("colorId");
+
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            CreateTaskDialogFragment newFragment = new CreateTaskDialogFragment();
+
+
+            // The device is smaller, so show the fragment fullscreen
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            // For a little polish, specify a transition animation
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            // To make it fullscreen, use the 'content' root view as the container
+            // for the fragment, which is always the root view for the activity
+            transaction.add(android.R.id.content, newFragment).addToBackStack(null).commit();
+
+        }
     }
 
     void updateHeader() {

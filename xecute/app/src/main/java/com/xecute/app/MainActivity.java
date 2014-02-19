@@ -11,48 +11,37 @@
 package com.xecute.app;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
-import android.widget.TextView;
 
-import com.parse.GetCallback;
-import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.List;
 
-public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener, ProjectsFragment.ProjectsFragmentListener {
+public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener,
+        ProjectsFragment.ProjectsFragmentListener, ProjectTaskFragment.ProjectTaskFragmentListener {
 
     Context mContext;
 
     ActionBar actionBar;
     Spinner navSpinner;
 
-    String listhHeaderValue;
+    String listHeaderValue;
 
     ProjectsFragment projectsFragment;
 
@@ -124,12 +113,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         Log.i("MAIN_ACTIVITY", "Selected Project at position: " + position);
         ParseObject project = (ParseObject) l.getItemAtPosition(position);
         String projectName = project.getString("projectName");
+        String colorStr = project.getParseObject("color").getObjectId();
         Log.i("MAIN_ACTIVITY", "Project Name: " + projectName + " Project id: " + project.getObjectId());
-        Log.i("MAIN_ACTIVITY", "listhHeaderValue: " + listhHeaderValue);
+        Log.i("MAIN_ACTIVITY", "Color: " + colorStr);
 
         Bundle bundle = new Bundle();
         bundle.putString("projectName", projectName);
         bundle.putString("projectId", project.getObjectId());
+        bundle.putString("colorId", colorStr);
 
         FragmentManager fragManager = getSupportFragmentManager();
         FragmentTransaction fragTrans = fragManager.beginTransaction();
@@ -142,4 +133,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     }
 
 
+    @Override
+    public void onProjectTaskSelected(ListView l, View v, int position) {
+
+    }
 }

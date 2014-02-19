@@ -28,23 +28,28 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import java.util.List;
 
 /**
  * Created by aaronburke on 2/12/14.
  */
-public class ProjectsFragment extends ListFragment {
+public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.OnQueryLoadListener<ParseObject> {
 
     Context mContext;
     ProjectListAdapter projectListAdapter;
     ListView projectList;
+    LinearLayout resetView;
 
     ProjectsFragmentListener mCallback;
 
@@ -62,6 +67,8 @@ public class ProjectsFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
+        resetView = (LinearLayout) inflater.inflate(R.layout.fragment_projects, container, false);
+
         setHasOptionsMenu(true);
         mContext = getActivity();
 
@@ -69,9 +76,12 @@ public class ProjectsFragment extends ListFragment {
         projectListAdapter.setAutoload(false);
 
         setListAdapter(projectListAdapter);
+
+        projectListAdapter.addOnQueryLoadListener(this);
+
         projectListAdapter.loadObjects();
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return resetView;
     }
 
     @Override
@@ -83,6 +93,7 @@ public class ProjectsFragment extends ListFragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("ListLongClick", "Activated onItemLongClick");
+
 
                 if (mActionMode != null) {
                     return false;
@@ -183,6 +194,15 @@ public class ProjectsFragment extends ListFragment {
         }
     }
 
+    @Override
+    public void onLoading() {
+
+    }
+
+    @Override
+    public void onLoaded(List<ParseObject> parseObjects, Exception e) {
+        updateHeader();
+    }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
@@ -251,6 +271,7 @@ public class ProjectsFragment extends ListFragment {
                             } else {
                                 dialog.dismiss();
                                 projectListAdapter.loadObjects();
+
                             }
                         }
                     });
@@ -297,15 +318,23 @@ public class ProjectsFragment extends ListFragment {
 
                         } else {
                             projectListAdapter.loadObjects();
+
                         }
                     }
                 });
-
 
             }
         });
         animation.setDuration(300);
         row.startAnimation(animation);
+    }
+
+    void updateHeader() {
+        if (projectListAdapter.isEmpty()) {
+            resetView.findViewById(R.id.header).getLayoutParams().height = 0;
+        } else {
+            resetView.findViewById(R.id.header).getLayoutParams().height = 60;
+        }
     }
 
 

@@ -10,6 +10,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="Projects">Projects</string>
 
     <!-- New Project Dialog -->
     <string name="name_required">Name Required to Save!</string>

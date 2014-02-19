@@ -5,7 +5,7 @@
  *
  * Author:		aaronburke
  *
- * Date:		 	2 16, 2014
+ * Date:		 	2 18, 2014
  */
 
 package com.xecute.app;
@@ -31,16 +31,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by aaronburke on 2/16/14.
+ * Created by aaronburke on 2/18/14.
  */
-public class ProjectListAdapter extends ParseQueryAdapter<ParseObject> {
+public class TaskListAdapter extends ParseQueryAdapter<ParseObject> {
     Context mContext;
 
-    public ProjectListAdapter(Context context) {
+    public TaskListAdapter(Context context, final String projectId) {
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
-                ParseQuery query = new ParseQuery("project");
-                query.whereEqualTo("createdBy", ParseUser.getCurrentUser());
+                ParseQuery query = new ParseQuery("task");
+                query.whereEqualTo("parentProject", projectId);
                 Log.i("QUERY", "Query = " + query);
                 return query;
             }
@@ -81,15 +81,15 @@ public class ProjectListAdapter extends ParseQueryAdapter<ParseObject> {
         });
 
         TextView projectName = (TextView) v.findViewById(R.id.text1);
-        projectName.setText(object.getString("projectName"));
-        Log.i("QUERY", "ProjectName = " + object.getString("projectName"));
+        projectName.setText(object.getString("taskName"));
+        Log.i("QUERY", "taskName = " + object.getString("taskName"));
 
         TextView projectDate = (TextView) v.findViewById(R.id.created_date);
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-        Date date = object.getCreatedAt();
+        Date date = object.getDate("dueDate");
         String dateStr = df.format(date);
         projectDate.setText(dateStr);
-        Log.i("QUERY", "createdAt = " + dateStr);
+        Log.i("QUERY", "dueDate = " + dateStr);
 
         TextView projectStatus = (TextView) v.findViewById(R.id.project_status);
         projectStatus.setText(object.getString("status"));

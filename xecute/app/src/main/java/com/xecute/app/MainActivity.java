@@ -43,6 +43,8 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.Objects;
+
 public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener, ProjectsFragment.ProjectsFragmentListener {
 
     Context mContext;
@@ -50,8 +52,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     ActionBar actionBar;
     Spinner navSpinner;
 
+    String listhHeaderValue;
+
     ProjectsFragment projectsFragment;
-    ProjectListAdapter projectAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,8 +120,25 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     }
 
     @Override
-    public void onItemSelected(ListView l, View v, int position) {
-        Log.i("Project List", "Selected item at position: " + position);
+    public void onProjectSelected(ListView l, View v, int position) {
+        Log.i("MAIN_ACTIVITY", "Selected Project at position: " + position);
+        ParseObject project = (ParseObject) l.getItemAtPosition(position);
+        String projectName = project.getString("projectName");
+        Log.i("MAIN_ACTIVITY", "Project Name: " + projectName + " Project id: " + project.getObjectId());
+        Log.i("MAIN_ACTIVITY", "listhHeaderValue: " + listhHeaderValue);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("projectName", projectName);
+        bundle.putString("projectId", project.getObjectId());
+
+        FragmentManager fragManager = getSupportFragmentManager();
+        FragmentTransaction fragTrans = fragManager.beginTransaction();
+        fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+
+        ProjectTaskFragment projectTaskFragment = new ProjectTaskFragment();
+        projectTaskFragment.setArguments(bundle);
+        fragTrans.replace(R.id.main_container, projectTaskFragment)
+                .addToBackStack(null).commit();
     }
 
 

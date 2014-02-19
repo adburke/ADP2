@@ -5,15 +5,13 @@
  *
  * Author:		aaronburke
  *
- * Date:		 	2 12, 2014
+ * Date:		 	2 18, 2014
  */
 
 package com.xecute.app;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -28,7 +26,6 @@ import android.view.ViewStub;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,56 +34,47 @@ import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 
 /**
- * Created by aaronburke on 2/12/14.
+ * Created by aaronburke on 2/18/14.
  */
-public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.OnQueryLoadListener<ParseObject> {
+public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapter.OnQueryLoadListener<ParseObject> {
 
     Context mContext;
-    ProjectListAdapter projectListAdapter;
+    TaskListAdapter taskListAdapter;
 
     public TextView header;
+    ListView projectList;
     LinearLayout mainListView;
 
     ViewStub stub;
 
-    ProjectsFragmentListener mCallback;
+    ProjectTaskFragmentListener mCallback;
 
     private ActionMode mActionMode;
 
     int itemPosition;
     View itemRow;
+    ViewGroup.MarginLayoutParams mlp;
 
-
-    public interface ProjectsFragmentListener {
-        public void onProjectSelected(ListView l, View v, int position);
+    public interface ProjectTaskFragmentListener {
+        public void onProjectTaskSelected(ListView l, View v, int position);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        mContext = getActivity();
-
         mainListView = (LinearLayout) inflater.inflate(R.layout.fragment_main_list, container, false);
-
         stub = (ViewStub) mainListView.findViewById(android.R.id.empty);
         stub.setLayoutResource(R.layout.project_empty_stub);
 
         header = (TextView) mainListView.findViewById(R.id.header);
-        header.setText(R.string.projects);
 
         setHasOptionsMenu(true);
-        projectListAdapter = new ProjectListAdapter(mContext);
-        projectListAdapter.setAutoload(false);
-        setListAdapter(projectListAdapter);
-        projectListAdapter.addOnQueryLoadListener(this);
-        projectListAdapter.loadObjects();
+        mContext = getActivity();
 
         return mainListView;
     }
@@ -96,6 +84,19 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
         super.onActivityCreated(savedState);
 
         getListView().getEmptyView().setVisibility(ListView.GONE);
+
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            String projectId = bundle.getString("projectId");
+            header.setText(bundle.getString("projectName"));
+
+            taskListAdapter = new TaskListAdapter(mContext, projectId);
+            taskListAdapter.setAutoload(false);
+            setListAdapter(taskListAdapter);
+            taskListAdapter.addOnQueryLoadListener(this);
+            taskListAdapter.loadObjects();
+        }
+
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
@@ -115,6 +116,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                 return true;
             }
         });
+
     }
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -156,49 +158,16 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
     };
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.projects_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.action_add_project:
-                Log.i("MAIN", "New Project Selected.");
-                createNewProject();
-                return true;
-
-            case R.id.action_filter_project:
-                Log.i("MAIN", "Filter Project Selected.");
-
-                AlertDialog.Builder filterBuilder = new AlertDialog.Builder(mContext);
-                filterBuilder.setTitle(R.string.action_filter_project)
-                        .setItems(R.array.project_filters, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
-                            }
-                        });
-                filterBuilder.create().show();
-
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mCallback = (ProjectsFragmentListener) activity;
+            mCallback = (ProjectTaskFragmentListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement ProjectsFragmentListener");
+                    + " must implement ProjectTaskFragmentListener");
         }
     }
 
@@ -216,77 +185,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        mCallback.onProjectSelected(l, v, position);
-    }
-
-    public void createNewProject() {
-        AlertDialog.Builder projectBuilder = new AlertDialog.Builder(mContext);
-        projectBuilder.setTitle(R.string.action_new_project);
-        // Get the layout inflater
-        //LayoutInflater inflater = this.getLayoutInflater();
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        final View view = inflater.inflate(R.layout.create_project, null);
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        projectBuilder.setView(view)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                });
-        final AlertDialog dialog = projectBuilder.create();
-        dialog.show();
-
-        //noinspection ConstantConditions
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                final Boolean[] wantToCloseDialog = {false};
-
-                EditText projectName = (EditText) view.findViewById(R.id.project_name);
-                TextView errorMessage = (TextView) view.findViewById(R.id.project_name_error);
-                if (projectName.getText().toString().isEmpty()) {
-                    Log.i("Save Project", "Name is empty!");
-                    errorMessage.setVisibility(View.VISIBLE);
-
-                } else {
-                    final ParseObject newProject = new ParseObject("project");
-                    newProject.put("projectName", projectName.getText().toString());
-                    newProject.put("status", "New");
-
-                    ParseUser user = ParseUser.getCurrentUser();
-                    newProject.put("createdBy", user);
-
-                    ParseObject color = ParseObject.createWithoutData("color", "ESp9ejI3iO");
-                    newProject.put("color", color);
-
-                    newProject.saveInBackground(new SaveCallback() {
-                        public void done(ParseException e) {
-                            if (e != null) {
-                                Log.i("MAIN", "Error saving Project: " + e.getMessage());
-                                try {
-                                    newProject.delete();
-                                } catch (ParseException e1) {
-                                    e1.printStackTrace();
-                                }
-                            } else {
-                                dialog.dismiss();
-                                projectListAdapter.loadObjects();
-
-                            }
-                        }
-                    });
-                }
-            }
-        });
-
+        mCallback.onProjectTaskSelected(l, v, position);
     }
 
     public void removeRow(final View row, final int position) {
@@ -317,7 +216,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                 row.getLayoutParams().height = initialHeight;
                 row.requestLayout();
 
-                ParseObject projectToDelete = projectListAdapter.getItem(position);
+                ParseObject projectToDelete = taskListAdapter.getItem(position);
 
                 projectToDelete.deleteInBackground(new DeleteCallback() {
                     public void done(ParseException e) {
@@ -325,7 +224,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                             Log.i("MAIN", "Error Deleting Project: " + e.getMessage());
 
                         } else {
-                            projectListAdapter.loadObjects();
+                            taskListAdapter.loadObjects();
 
                         }
                     }
@@ -338,7 +237,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
     }
 
     void updateHeader() {
-        if (projectListAdapter.isEmpty()) {
+        if (taskListAdapter.isEmpty()) {
             header.getLayoutParams().height = 0;
             header.setVisibility(View.GONE);
 
@@ -347,13 +246,5 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
             header.setVisibility(View.VISIBLE);
         }
     }
-
-    // Keeping around for reference of dp to pixel conversion
-    public int getPixelsFromDPS(int dps) {
-        final float scale = mContext.getResources().getDisplayMetrics().density;
-        int pixels = (int) (dps * scale + 0.5f);
-        return pixels;
-    }
-
 
 }

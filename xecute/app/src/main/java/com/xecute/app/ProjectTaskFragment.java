@@ -74,7 +74,7 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
 
         mainListView = (LinearLayout) inflater.inflate(R.layout.fragment_main_list, container, false);
         stub = (ViewStub) mainListView.findViewById(android.R.id.empty);
-        stub.setLayoutResource(R.layout.project_empty_stub);
+        stub.setLayoutResource(R.layout.task_empty_stub);
 
         header = (TextView) mainListView.findViewById(R.id.header);
 
@@ -131,7 +131,7 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             // Inflate a menu resource providing context menu items
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.context_menu, menu);
+            inflater.inflate(R.menu.delete_context_menu, menu);
             return true;
         }
 
@@ -283,13 +283,8 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             CreateTaskDialogFragment newFragment = new CreateTaskDialogFragment();
 
-
-            // The device is smaller, so show the fragment fullscreen
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            // For a little polish, specify a transition animation
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            // To make it fullscreen, use the 'content' root view as the container
-            // for the fragment, which is always the root view for the activity
             transaction.add(android.R.id.content, newFragment).addToBackStack(null).commit();
 
         }

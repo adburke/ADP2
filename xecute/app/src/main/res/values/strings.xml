@@ -11,6 +11,15 @@
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="projects">Projects</string>
+    <string name="save">Save</string>
+
+    <!-- New Task Dialog-->
+    <string name="task_name_hint">Task Name</string>
+    <string name="task_date_holder">Date Chosen</string>
+    <string name="choose_date_btn">Choose Due Date</string>
+    <string name="task_users_btn">Task Users</string>
+    <string name="user_list_header">Users Assigned</string>
+    <string name="task_description">Task Description</string>
 
     <!-- New Project Dialog -->
     <string name="name_required">Name Required to Save!</string>

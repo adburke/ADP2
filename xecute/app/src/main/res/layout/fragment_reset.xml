@@ -38,7 +38,7 @@
         android:layout_marginTop="15dp"
         android:textColorHint="#cccccc"
         android:textColor="#ffffff"
-        android:background="#2cb6d2"
+        android:background="@drawable/light_blue_button"
         android:text="Reset Password"/>
 
 

@@ -12,12 +12,77 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/task_name_hint"
+        android:textColorHint="#cccccc"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"/>
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="TESTING"
-        android:background="#C8C8C8"/>
+        android:layout_height="wrap_content"
+        android:text="@string/task_date_holder"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/chooseDateBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="310dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:textColorHint="#cccccc"
+        android:textColor="#ffffff"
+        android:background="@drawable/blue_button"
+        android:text="@string/choose_date_btn"/>
+
+    <Button
+        android:id="@+id/taskUsersBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="310dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:textColorHint="#cccccc"
+        android:textColor="#ffffff"
+        android:background="@drawable/light_blue_button"
+        android:text="@string/task_users_btn"/>
+
+    <TextView
+        android:id="@+id/header"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/user_list_header"/>
+
+    <ListView
+        android:id="@+id/userList"
+        android:layout_width="match_parent"
+        android:layout_height="125dp">
+        </ListView>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/task_description"
+        android:textColorHint="#cccccc"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"/>
+
 
 </LinearLayout>

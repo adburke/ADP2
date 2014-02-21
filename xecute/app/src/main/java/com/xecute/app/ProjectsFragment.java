@@ -164,17 +164,17 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.action_add_project:
+            case R.id.action_add:
                 Log.i("MAIN", "New Project Selected.");
                 createNewProject();
                 return true;
 
-            case R.id.action_filter_project:
+            case R.id.action_filter:
                 Log.i("MAIN", "Filter Project Selected.");
 
                 AlertDialog.Builder filterBuilder = new AlertDialog.Builder(mContext);
-                filterBuilder.setTitle(R.string.action_filter_project)
-                        .setItems(R.array.project_filters, new DialogInterface.OnClickListener() {
+                filterBuilder.setTitle(R.string.action_filter)
+                        .setItems(R.array.filters, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // The 'which' argument contains the index position
                                 // of the selected item
@@ -221,7 +221,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
 
     public void createNewProject() {
         AlertDialog.Builder projectBuilder = new AlertDialog.Builder(mContext);
-        projectBuilder.setTitle(R.string.action_new_project);
+        projectBuilder.setTitle(R.string.action_new);
         // Get the layout inflater
         //LayoutInflater inflater = this.getLayoutInflater();
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );

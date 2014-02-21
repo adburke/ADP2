@@ -171,17 +171,17 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.action_add_project:
-                Log.i("MAIN", "New Project Selected.");
+            case R.id.action_add:
+                Log.i("MAIN", "New Task selected.");
                 createNewTask();
                 return true;
 
-            case R.id.action_filter_project:
-                Log.i("MAIN", "Filter Project Selected.");
+            case R.id.action_filter:
+                Log.i("MAIN", "Filter Task Selected.");
 
                 AlertDialog.Builder filterBuilder = new AlertDialog.Builder(mContext);
-                filterBuilder.setTitle(R.string.action_filter_project)
-                        .setItems(R.array.project_filters, new DialogInterface.OnClickListener() {
+                filterBuilder.setTitle(R.string.action_filter)
+                        .setItems(R.array.filters, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // The 'which' argument contains the index position
                                 // of the selected item

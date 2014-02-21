@@ -5,8 +5,8 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string name="action_logout">Log Out</string>
-    <string name="action_new_project">New Project</string>
-    <string name="action_filter_project">Filter Projects</string>
+    <string name="action_new">New</string>
+    <string name="action_filter">Filter</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
@@ -20,6 +20,8 @@
     <string name="task_users_btn">Task Users</string>
     <string name="user_list_header">Users Assigned</string>
     <string name="task_description">Task Description</string>
+    <string name="task_user_hint">Username</string>
+    <string name="user_not_found">Username not found!</string>
 
     <!-- New Project Dialog -->
     <string name="name_required">Name Required to Save!</string>
@@ -32,7 +34,7 @@
     </string-array>
 
     <!-- Projects Filter Array -->
-    <string-array name="project_filters">
+    <string-array name="filters">
         <item>All</item>
         <item>Open</item>
         <item>Completed</item>

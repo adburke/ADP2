@@ -11,6 +11,7 @@
 package com.xecute.app;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -31,19 +32,48 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by aaronburke on 2/19/14.
  */
-public class CreateTaskDialogFragment extends DialogFragment implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class CreateTaskDialogFragment extends DialogFragment implements View.OnClickListener {
 
     Context mContext;
+
+    CreateTaskDialogListener mCallback;
     private ActionMode mActionMode;
+
     Button chooseDateBtn;
     Button taskUserBtn;
+    TextView dateChosenTxt;
+    EditText taskName;
+    EditText taskDescription;
+    ListView userList;
+
+    DatePicker mDatePicker;
+
+    int monthSelected, daySelected, yearSelected;
+    Date taskDueDate;
+
+    ArrayList<ParseUser> taskedUsers;
+    UserListAdapter userListAdapter;
+
+
+    public interface CreateTaskDialogListener {
+        public void onTaskCreate(String taskNameStr, Date date , ArrayList<ParseUser> users, String taskDescriptionStr);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,6 +88,14 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
         taskUserBtn = (Button) createTaskView.findViewById(R.id.taskUsersBtn);
         taskUserBtn.setOnClickListener(this);
 
+        dateChosenTxt = (TextView) createTaskView.findViewById(R.id.dateChosen);
+        taskName = (EditText) createTaskView.findViewById(R.id.taskName);
+        taskDescription = (EditText) createTaskView.findViewById(R.id.taskDescription);
+        userList = (ListView) createTaskView.findViewById(R.id.userList);
+
+        taskedUsers = new ArrayList<ParseUser>();
+        userListAdapter = new UserListAdapter(mContext,taskedUsers);
+        userList.setAdapter(userListAdapter);
 
         return createTaskView;
     }
@@ -93,6 +131,7 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.item_save:
+                    saveTaskData();
                     mode.finish(); // Action picked, so close the CAB
                     return true;
                 default:
@@ -109,6 +148,17 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
         }
     };
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (CreateTaskDialogListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement CreateTaskDialogListener");
+        }
+    }
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -124,14 +174,24 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
             case R.id.chooseDateBtn:
                 Log.i("CREATE_TASK", "Choose date btn");
                 final Calendar c = Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR);
-                int mMonth = c.get(Calendar.MONTH);
-                int mDay = c.get(Calendar.DAY_OF_MONTH);
 
-                DatePickerDialog datePickerDialog = new DatePickerDialog(
-                        mContext, this, mYear, mMonth, mDay) {
+                final DatePickerDialog datePickerDialog;
+                if (daySelected != 0 && monthSelected != 0 && yearSelected != 0) {
+                    datePickerDialog = new DatePickerDialog(
+                            mContext, null, yearSelected, monthSelected-1, daySelected) {
+                    };
 
-                };
+                } else {
+                    int mYear = c.get(Calendar.YEAR);
+                    int mMonth = c.get(Calendar.MONTH);
+                    int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                    datePickerDialog = new DatePickerDialog(mContext, null, mYear, mMonth, mDay) {
+                    };
+                }
+
+
+                mDatePicker = datePickerDialog.getDatePicker();
 
                 datePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
                         new DialogInterface.OnClickListener() {
@@ -142,7 +202,17 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
                             }
                         });
 
-                datePickerDialog.setCancelable(false);
+                datePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Done",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which == DialogInterface.BUTTON_POSITIVE) {
+                                    setDate(mDatePicker);
+                                    dialog.dismiss();
+                                }
+                            }
+                        });
+
+                datePickerDialog.setCancelable(true);
                 datePickerDialog.show();
                 break;
 
@@ -153,14 +223,9 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
         }
     }
 
-    @Override
-    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-    }
-
     void taskUser() {
         AlertDialog.Builder projectBuilder = new AlertDialog.Builder(mContext);
-        projectBuilder.setTitle(R.string.action_new);
+        projectBuilder.setTitle(R.string.user_name_input);
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         final View view = inflater.inflate(R.layout.task_user, null);
 
@@ -192,10 +257,49 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
                     errorMessage.setVisibility(View.VISIBLE);
 
                 } else {
-                
+                    ParseQuery<ParseUser> query = ParseUser.getQuery();
+                    query.whereEqualTo("username", userName.getText().toString());
+                    query.findInBackground(new FindCallback<ParseUser>() {
+                        public void done(List<ParseUser> objects, ParseException e) {
+                            if (e == null) {
+                                updateTaskedUsersList(objects.get(0));
+                                dialog.dismiss();
+                            } else {
+                                Log.i("Query_USER", "FAILED due to: " + e.getMessage());
+                                dialog.dismiss();
+                            }
+                        }
+                    });
                 }
 
             }
         });
     }
+
+    public void setDate(DatePicker datePicker) {
+        monthSelected = datePicker.getMonth();
+        daySelected = datePicker.getDayOfMonth();
+        yearSelected = datePicker.getYear();
+
+        dateChosenTxt.setText(monthSelected+1 + "/" + daySelected + "/" + yearSelected);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(yearSelected,monthSelected,daySelected);
+        taskDueDate = calendar.getTime();
+    }
+
+    public void saveTaskData() {
+        String taskNameStr = taskName.getText().toString();
+        Date date = taskDueDate;
+        String taskDescriptionStr = taskDescription.getText().toString();
+
+
+        mCallback.onTaskCreate(taskNameStr,date,this.taskedUsers,taskDescriptionStr);
+    }
+
+    public void updateTaskedUsersList(ParseUser user) {
+        Log.i("PARSE_USER_ADD", user.getUsername());
+        taskedUsers.add(user);
+        userListAdapter.notifyDataSetChanged();
+    }
+
 }

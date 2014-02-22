@@ -38,7 +38,10 @@ import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -300,5 +303,6 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
             header.setVisibility(View.VISIBLE);
         }
     }
+
 
 }

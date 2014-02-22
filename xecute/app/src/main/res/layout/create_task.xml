@@ -16,6 +16,7 @@
     android:background="#ffffff">
 
     <EditText
+        android:id="@+id/taskName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/task_name_hint"
@@ -23,9 +24,11 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:maxLines="1"/>
 
     <TextView
+        android:id="@+id/dateChosen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/task_date_holder"
@@ -75,6 +78,7 @@
         </ListView>
 
     <EditText
+        android:id="@+id/taskDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/task_description"

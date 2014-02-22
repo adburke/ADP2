@@ -22,6 +22,7 @@
     <string name="task_description">Task Description</string>
     <string name="task_user_hint">Username</string>
     <string name="user_not_found">Username not found!</string>
+    <string name="user_name_input">Input Username to Task</string>
 
     <!-- New Project Dialog -->
     <string name="name_required">Name Required to Save!</string>

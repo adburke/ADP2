@@ -30,11 +30,14 @@ import android.widget.SpinnerAdapter;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener,
-        ProjectsFragment.ProjectsFragmentListener, ProjectTaskFragment.ProjectTaskFragmentListener {
+        ProjectsFragment.ProjectsFragmentListener, ProjectTaskFragment.ProjectTaskFragmentListener,
+        CreateTaskDialogFragment.CreateTaskDialogListener{
 
     Context mContext;
 
@@ -135,6 +138,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
     @Override
     public void onProjectTaskSelected(ListView l, View v, int position) {
+
+    }
+
+    @Override
+    public void onTaskCreate(String taskNameStr, Date date, ArrayList<ParseUser> users, String taskDescriptionStr) {
 
     }
 }

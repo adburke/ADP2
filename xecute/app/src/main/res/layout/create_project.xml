@@ -24,7 +24,8 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:hint="@string/project_name_hint"
-        android:textColorHint="#C0C0C0"/>
+        android:textColorHint="#C0C0C0"
+        android:maxLines="1"/>
 
     <TextView
         android:id="@+id/project_name_error"

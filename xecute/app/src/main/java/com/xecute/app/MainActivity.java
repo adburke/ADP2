@@ -27,6 +27,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -156,6 +157,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         ParseObject color = ParseObject.createWithoutData("color", selectedColorStr);
         newTask.put("color", color);
         newTask.put("dueDate", date);
+
+        ParseACL groupACl = new ParseACL();
+        for (ParseUser user : users) {
+            groupACl.setReadAccess(user, true);
+            groupACl.setWriteAccess(user, true);
+        }
+        groupACl.setReadAccess(ParseUser.getCurrentUser(), true);
+        groupACl.setWriteAccess(ParseUser.getCurrentUser(), true);
+        newTask.setACL(groupACl);
 
         newTask.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {

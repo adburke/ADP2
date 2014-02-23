@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -77,6 +78,14 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
 
     public interface CreateTaskDialogListener {
         public void onTaskCreate(String taskNameStr, Date date , ArrayList<ParseUser> users, String taskDescriptionStr);
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
     }
 
     @Override
@@ -161,15 +170,6 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
             throw new ClassCastException(activity.toString()
                     + " must implement CreateTaskDialogListener");
         }
-    }
-
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        return dialog;
     }
 
     @Override

@@ -51,15 +51,14 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
 
     Context mContext;
     Bundle currentBundle;
-    TaskListAdapter taskListAdapter;
+    public TaskListAdapter taskListAdapter;
 
     public TextView header;
-    ListView projectList;
     LinearLayout mainListView;
 
-    ViewStub stub;
-
     ProjectTaskFragmentListener mCallback;
+
+    ViewStub stubLoad;
 
     private ActionMode mActionMode;
 
@@ -75,14 +74,24 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
+        mContext = getActivity();
+
+        MainActivity mainActivity = (MainActivity)getActivity();
+
         mainListView = (LinearLayout) inflater.inflate(R.layout.fragment_main_list, container, false);
-        stub = (ViewStub) mainListView.findViewById(android.R.id.empty);
-        stub.setLayoutResource(R.layout.task_empty_stub);
+        stubLoad = (ViewStub) mainListView.findViewById(android.R.id.empty);
+        stubLoad.setLayoutResource(R.layout.task_empty_stub);
 
         header = (TextView) mainListView.findViewById(R.id.header);
+        header.setText(mainActivity.selectedProject.getString("projectName"));
 
         setHasOptionsMenu(true);
-        mContext = getActivity();
+        taskListAdapter = new TaskListAdapter(mContext, mainActivity.selectedProject);
+        taskListAdapter.setAutoload(false);
+        setListAdapter(taskListAdapter);
+        taskListAdapter.addOnQueryLoadListener(this);
+        taskListAdapter.loadObjects();
+
 
         return mainListView;
     }
@@ -92,18 +101,6 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
         super.onActivityCreated(savedState);
 
         getListView().getEmptyView().setVisibility(ListView.GONE);
-
-        currentBundle = this.getArguments();
-        if (currentBundle != null) {
-            String projectId = currentBundle.getString("projectId");
-            header.setText(currentBundle.getString("projectName"));
-
-            taskListAdapter = new TaskListAdapter(mContext, projectId);
-            taskListAdapter.setAutoload(false);
-            setListAdapter(taskListAdapter);
-            taskListAdapter.addOnQueryLoadListener(this);
-            taskListAdapter.loadObjects();
-        }
 
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
@@ -278,19 +275,13 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
     }
 
     void createNewTask(){
-        if (currentBundle != null) {
-            String projectId = currentBundle.getString("projectId");
-            String projectName = currentBundle.getString("projectName");
-            String colorId = currentBundle.getString("colorId");
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        CreateTaskDialogFragment newFragment = new CreateTaskDialogFragment();
 
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            CreateTaskDialogFragment newFragment = new CreateTaskDialogFragment();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.add(android.R.id.content, newFragment).addToBackStack(null).commit();
 
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            transaction.add(android.R.id.content, newFragment).addToBackStack(null).commit();
-
-        }
     }
 
     void updateHeader() {

@@ -19,8 +19,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -244,16 +248,34 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
         final AlertDialog dialog = projectBuilder.create();
         dialog.show();
 
+        final TextView errorMessage = (TextView) view.findViewById(R.id.user_name_error);
+        final EditText userName = (EditText) view.findViewById(R.id.user_name);
+        userName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                errorMessage.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         //noinspection ConstantConditions
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Boolean[] wantToCloseDialog = {false};
 
-                EditText userName = (EditText) view.findViewById(R.id.user_name);
-                TextView errorMessage = (TextView) view.findViewById(R.id.user_name_error);
                 if (userName.getText().toString().isEmpty()) {
                     Log.i("Save Project", "Username is empty!");
+                    errorMessage.setText("Username is empty!");
                     errorMessage.setVisibility(View.VISIBLE);
 
                 } else {
@@ -261,12 +283,23 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
                     query.whereEqualTo("username", userName.getText().toString());
                     query.findInBackground(new FindCallback<ParseUser>() {
                         public void done(List<ParseUser> objects, ParseException e) {
-                            if (e == null) {
-                                updateTaskedUsersList(objects.get(0));
-                                dialog.dismiss();
+                            if (e == null && objects.size() > 0) {
+                                boolean addResult = updateTaskedUsersList(objects.get(0));
+                                if (addResult) {
+                                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                                            Context.INPUT_METHOD_SERVICE);
+                                    imm.hideSoftInputFromWindow(userName.getWindowToken(), 0);
+                                    dialog.dismiss();
+
+                                } else {
+                                    errorMessage.setText("User is already tasked!");
+                                    userName.setText("");
+                                    errorMessage.setVisibility(View.VISIBLE);
+                                }
+
                             } else {
-                                Log.i("Query_USER", "FAILED due to: " + e.getMessage());
-                                dialog.dismiss();
+                                errorMessage.setText("Username not found!");
+                                errorMessage.setVisibility(View.VISIBLE);
                             }
                         }
                     });
@@ -296,10 +329,16 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
         mCallback.onTaskCreate(taskNameStr,date,this.taskedUsers,taskDescriptionStr);
     }
 
-    public void updateTaskedUsersList(ParseUser user) {
+    public Boolean updateTaskedUsersList(ParseUser user) {
         Log.i("PARSE_USER_ADD", user.getUsername());
+        for (int i = 0, j = taskedUsers.size(); i<j; i++) {
+            if (user.getUsername().equals(taskedUsers.get(i).getUsername()) ) {
+                return false;
+            }
+        }
         taskedUsers.add(user);
         userListAdapter.notifyDataSetChanged();
+        return true;
     }
 
 }

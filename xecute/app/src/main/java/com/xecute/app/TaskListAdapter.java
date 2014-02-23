@@ -36,12 +36,12 @@ import java.util.Date;
 public class TaskListAdapter extends ParseQueryAdapter<ParseObject> {
     Context mContext;
 
-    public TaskListAdapter(Context context, final String projectId) {
+    public TaskListAdapter(Context context, final ParseObject project) {
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
                 ParseQuery query = new ParseQuery("task");
-                query.whereEqualTo("parentProject", projectId);
-                Log.i("QUERY", "Query = " + query);
+                query.whereEqualTo("parentProject", project);
+                Log.i("QUERY", "parentProject = " + project.getObjectId());
                 return query;
             }
         });

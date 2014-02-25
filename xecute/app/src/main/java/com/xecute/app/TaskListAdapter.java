@@ -85,11 +85,13 @@ public class TaskListAdapter extends ParseQueryAdapter<ParseObject> {
         Log.i("QUERY", "taskName = " + object.getString("taskName"));
 
         TextView projectDate = (TextView) v.findViewById(R.id.created_date);
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-        Date date = object.getDate("dueDate");
-        String dateStr = df.format(date);
-        projectDate.setText(dateStr);
-        Log.i("QUERY", "dueDate = " + dateStr);
+        if (object.getDate("dueDate") != null) {
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+            Date date = object.getDate("dueDate");
+            String dateStr = df.format(date);
+            projectDate.setText(dateStr);
+            Log.i("QUERY", "dueDate = " + dateStr);
+        }
 
         TextView projectStatus = (TextView) v.findViewById(R.id.project_status);
         String percent = Integer.toString(object.getInt("percentCompleted"));

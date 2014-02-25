@@ -11,6 +11,7 @@
 package com.xecute.app;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,13 +37,25 @@ import java.util.Date;
 public class ProjectListAdapter extends ParseQueryAdapter<ParseObject> {
     Context mContext;
 
-    public ProjectListAdapter(Context context) {
+    public ProjectListAdapter(Context context, final String filter) {
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
-                ParseQuery query = new ParseQuery("project");
-                query.whereEqualTo("createdBy", ParseUser.getCurrentUser());
-                Log.i("QUERY", "Query = " + query);
-                return query;
+                if (filter.equals("all")) {
+                    ParseQuery query = new ParseQuery("project");
+                    //query.whereEqualTo("createdBy", ParseUser.getCurrentUser());
+                    Log.i("QUERY", "Query = " + query);
+                    return query;
+                } else if (filter.equals("Active")) {
+                    ParseQuery query = new ParseQuery("project");
+                    query.whereEqualTo("status", "Active");
+                    return query;
+                } else if (filter.equals("Completed")) {
+                    ParseQuery query = new ParseQuery("project");
+                    query.whereEqualTo("status", "Completed");
+                    return query;
+                }
+
+                return null;
             }
         });
         mContext = context;
@@ -92,6 +105,9 @@ public class ProjectListAdapter extends ParseQueryAdapter<ParseObject> {
         Log.i("QUERY", "createdAt = " + dateStr);
 
         TextView projectStatus = (TextView) v.findViewById(R.id.project_status);
+        if (object.getString("status").equals("Active")) {
+            projectStatus.setTextColor(Color.parseColor("#009900"));
+        }
         projectStatus.setText(object.getString("status"));
         Log.i("QUERY", "status = " + object.getString("status"));
 

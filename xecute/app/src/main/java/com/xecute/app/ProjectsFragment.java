@@ -10,10 +10,12 @@
 
 package com.xecute.app;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -29,13 +31,17 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.DeleteCallback;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -45,15 +51,16 @@ import java.util.List;
 /**
  * Created by aaronburke on 2/12/14.
  */
-public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.OnQueryLoadListener<ParseObject> {
+public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.OnQueryLoadListener {
 
     Context mContext;
-    ProjectListAdapter projectListAdapter;
+    public ProjectListAdapter projectListAdapter;
 
     public TextView header;
     LinearLayout mainListView;
 
     ViewStub stub;
+    ImageView imageView;
 
     ProjectsFragmentListener mCallback;
 
@@ -62,6 +69,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
     int itemPosition;
     View itemRow;
 
+    Boolean filter;
 
     public interface ProjectsFragmentListener {
         public void onProjectSelected(ListView l, View v, int position);
@@ -70,6 +78,8 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+
+        filter = false;
 
         mContext = getActivity();
 
@@ -82,10 +92,10 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
         header.setText(R.string.projects);
 
         setHasOptionsMenu(true);
-        projectListAdapter = new ProjectListAdapter(mContext);
+        projectListAdapter = new ProjectListAdapter(mContext, "all");
         projectListAdapter.setAutoload(false);
-        setListAdapter(projectListAdapter);
         projectListAdapter.addOnQueryLoadListener(this);
+        setListAdapter(projectListAdapter);
         projectListAdapter.loadObjects();
 
         return mainListView;
@@ -115,6 +125,8 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                 return true;
             }
         });
+
+
     }
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -160,6 +172,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
         inflater.inflate(R.menu.projects_menu, menu);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -176,14 +189,41 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                 filterBuilder.setTitle(R.string.action_filter)
                         .setItems(R.array.filters, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
+                                switch (which) {
+                                    case 0:
+                                        projectListAdapter = new ProjectListAdapter(mContext, "all");
+                                        filter = false;
+                                        updateList(projectListAdapter);
+                                        break;
+                                    case 1:
+                                        projectListAdapter = new ProjectListAdapter(mContext, "Active");
+                                        filter = true;
+                                        updateList(projectListAdapter);
+                                        break;
+                                    case 2:
+                                        projectListAdapter = new ProjectListAdapter(mContext, "Completed");
+                                        filter = true;
+                                        updateList(projectListAdapter);
+                                        break;
+                                }
                             }
+
                         });
+
+                filterBuilder.setOnDismissListener( new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Log.i("DIALOG", "DISMISSED");
+
+                    }
+                });
+
                 filterBuilder.create().show();
 
                 return true;
         }
+
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -203,20 +243,30 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
     }
 
     @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        mCallback.onProjectSelected(l, v, position);
+    }
+
+    @Override
     public void onLoading() {
 
     }
 
     @Override
-    public void onLoaded(List<ParseObject> parseObjects, Exception e) {
+    public void onLoaded(List list, Exception e) {
+        Log.i("onLoaded", "FIRED");
         updateHeader();
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        mCallback.onProjectSelected(l, v, position);
+        if (list.size() == 0 && filter) {
+            imageView = (ImageView) mainListView.findViewById(R.id.emptyProjects);
+            imageView.setBackgroundResource(R.drawable.no_data);
+            filter = false;
+        } else {
+            if (imageView != null && !filter) {
+                imageView.setBackgroundResource(R.drawable.empty_projects);
+            }
+        }
     }
 
     public void createNewProject() {
@@ -250,6 +300,9 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
             {
                 final Boolean[] wantToCloseDialog = {false};
 
+                final ParseObject[] projectColor = new ParseObject[1];
+                final ParseObject newProject;
+
                 EditText projectName = (EditText) view.findViewById(R.id.project_name);
                 TextView errorMessage = (TextView) view.findViewById(R.id.project_name_error);
                 if (projectName.getText().toString().isEmpty()) {
@@ -257,32 +310,41 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                     errorMessage.setVisibility(View.VISIBLE);
 
                 } else {
-                    final ParseObject newProject = new ParseObject("project");
+                    newProject = new ParseObject("project");
                     newProject.put("projectName", projectName.getText().toString());
                     newProject.put("status", "New");
 
                     ParseUser user = ParseUser.getCurrentUser();
                     newProject.put("createdBy", user);
 
-                    ParseObject color = ParseObject.createWithoutData("color", "ESp9ejI3iO");
-                    newProject.put("color", color);
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("color");
+                    query.whereEqualTo("useStatus", false);
+                    query.getFirstInBackground( new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(ParseObject parseObject, ParseException e) {
+                            newProject.put("color", parseObject);
+                            parseObject.put("useStatus", true);
+                            parseObject.saveInBackground();
 
-                    newProject.saveInBackground(new SaveCallback() {
-                        public void done(ParseException e) {
-                            if (e != null) {
-                                Log.i("MAIN", "Error saving Project: " + e.getMessage());
-                                try {
-                                    newProject.delete();
-                                } catch (ParseException e1) {
-                                    e1.printStackTrace();
+                            newProject.saveInBackground(new SaveCallback() {
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        Log.i("MAIN", "Error saving Project: " + e.getMessage());
+                                        try {
+                                            newProject.delete();
+                                        } catch (ParseException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    } else {
+                                        dialog.dismiss();
+                                        projectListAdapter.loadObjects();
+
+                                    }
                                 }
-                            } else {
-                                dialog.dismiss();
-                                projectListAdapter.loadObjects();
-
-                            }
+                            });
                         }
                     });
+
                 }
             }
         });
@@ -318,6 +380,26 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                 row.requestLayout();
 
                 ParseObject projectToDelete = projectListAdapter.getItem(position);
+                projectToDelete.getParseObject("color").fetchInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject parseObject, ParseException e) {
+                        parseObject.put("useStatus", false);
+                        parseObject.saveInBackground();
+                    }
+                });
+
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("task");
+                query.whereEqualTo("parentProject", projectToDelete);
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> parseObjects, ParseException e) {
+                        if (parseObjects != null || parseObjects.size() != 0) {
+                            for (ParseObject object : parseObjects) {
+                                object.deleteInBackground();
+                            }
+                        }
+                    }
+                });
 
                 projectToDelete.deleteInBackground(new DeleteCallback() {
                     public void done(ParseException e) {
@@ -346,6 +428,12 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
             header.getLayoutParams().height = 60;
             header.setVisibility(View.VISIBLE);
         }
+    }
+
+    void updateList(ProjectListAdapter adapter) {
+        adapter.addOnQueryLoadListener(this);
+        getListView().setAdapter(adapter);
+        getListView().getEmptyView().setVisibility(ListView.GONE);
     }
 
     // Keeping around for reference of dp to pixel conversion

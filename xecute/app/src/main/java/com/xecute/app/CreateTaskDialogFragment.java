@@ -180,7 +180,7 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
                 final DatePickerDialog datePickerDialog;
                 if (daySelected != 0 && monthSelected != 0 && yearSelected != 0) {
                     datePickerDialog = new DatePickerDialog(
-                            mContext, null, yearSelected, monthSelected-1, daySelected) {
+                            mContext, null, yearSelected, monthSelected, daySelected) {
                     };
 
                 } else {
@@ -319,8 +319,14 @@ public class CreateTaskDialogFragment extends DialogFragment implements View.OnC
     }
 
     public void saveTaskData() {
+        Date date;
+
         String taskNameStr = taskName.getText().toString();
-        Date date = taskDueDate;
+        if (taskDueDate != null) {
+            date = taskDueDate;
+        } else {
+            date = null;
+        }
         String taskDescriptionStr = taskDescription.getText().toString();
 
 

@@ -27,14 +27,17 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
+import com.parse.FindCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener,
         ProjectsFragment.ProjectsFragmentListener, ProjectTaskFragment.ProjectTaskFragmentListener,
@@ -63,7 +66,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
 
         navSpinner = new Spinner(mContext);
         SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(mContext, R.array.action_list,
@@ -116,6 +118,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         return false;
     }
 
+
     @Override
     public void onProjectSelected(ListView l, View v, int position) {
         Log.i("MAIN_ACTIVITY", "Selected Project at position: " + position);
@@ -144,8 +147,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
     @Override
     public void onTaskCreate(String taskNameStr, Date date, ArrayList<ParseUser> users, String taskDescriptionStr) {
-        Log.i("MAIN_TASK_CREATE", "DATA: " + taskNameStr + " - " + date.toString() + " - " + users.size() + " - " + taskDescriptionStr);
-        Log.i("MAIN_TASK_CREATE", "DATA: " + selectedProject.getString("projectName"));
 
         final ParseObject newTask = new ParseObject("task");
         newTask.put("taskName", taskNameStr);
@@ -156,7 +157,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         newTask.put("percentCompleted", 0);
         ParseObject color = ParseObject.createWithoutData("color", selectedColorStr);
         newTask.put("color", color);
-        newTask.put("dueDate", date);
+
+        if (date != null) {
+            Log.i("MAIN_TASK_CREATE", "DATA: " + taskNameStr + " - " + date.toString() + " - " + users.size() + " - " + taskDescriptionStr);
+            newTask.put("dueDate", date);
+        }
+        Log.i("MAIN_TASK_CREATE", "DATA: " + selectedProject.getString("projectName"));
 
         ParseACL groupACl = new ParseACL();
         for (ParseUser user : users) {
@@ -183,6 +189,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
                 }
             }
         });
+
+        if (selectedProject.getString("status").equals("New")) {
+            selectedProject.put("status", "Active");
+            selectedProject.saveInBackground();
+        }
 
     }
 }

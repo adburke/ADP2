@@ -37,7 +37,7 @@
     <!-- Projects Filter Array -->
     <string-array name="filters">
         <item>All</item>
-        <item>Open</item>
+        <item>Active</item>
         <item>Completed</item>
     </string-array>
 

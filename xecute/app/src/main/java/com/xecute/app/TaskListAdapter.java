@@ -36,12 +36,19 @@ import java.util.Date;
 public class TaskListAdapter extends ParseQueryAdapter<ParseObject> {
     Context mContext;
 
-    public TaskListAdapter(Context context, final ParseObject project) {
+    public TaskListAdapter(Context context, final ParseObject project, final String filter) {
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
                 ParseQuery query = new ParseQuery("task");
-                query.whereEqualTo("parentProject", project);
-                Log.i("QUERY", "parentProject = " + project.getObjectId());
+                if (project != null) {
+                    query.whereEqualTo("parentProject", project);
+                }
+                if (filter.equals("Active")) {
+                    query.whereLessThan("percentCompleted", 100);
+                } else if (filter.equals("Completed")) {
+                    query.whereEqualTo("percentCompleted", 100);
+                }
+//                Log.i("QUERY", "parentProject = " + project.getObjectId());
                 return query;
             }
         });

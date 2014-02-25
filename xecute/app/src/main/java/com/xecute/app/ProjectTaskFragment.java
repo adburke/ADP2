@@ -12,7 +12,6 @@ package com.xecute.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -28,10 +27,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -49,7 +48,7 @@ import java.util.List;
 public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapter.OnQueryLoadListener<ParseObject> {
 
     Context mContext;
-    Bundle currentBundle;
+
     public TaskListAdapter taskListAdapter;
 
     public TextView header;
@@ -57,13 +56,16 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
 
     ProjectTaskFragmentListener mCallback;
 
-    ViewStub stubLoad;
+    MainActivity mainActivity;
+    Boolean filter;
+
+    ViewStub stub;
+    ImageView imageView;
 
     private ActionMode mActionMode;
 
     int itemPosition;
     View itemRow;
-    ViewGroup.MarginLayoutParams mlp;
 
     public interface ProjectTaskFragmentListener {
         public void onProjectTaskSelected(ListView l, View v, int position);
@@ -75,17 +77,19 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
 
         mContext = getActivity();
 
-        MainActivity mainActivity = (MainActivity)getActivity();
+        filter = false;
+
+        mainActivity = (MainActivity)getActivity();
 
         mainListView = (LinearLayout) inflater.inflate(R.layout.fragment_main_list, container, false);
-        stubLoad = (ViewStub) mainListView.findViewById(android.R.id.empty);
-        stubLoad.setLayoutResource(R.layout.task_empty_stub);
+        stub = (ViewStub) mainListView.findViewById(android.R.id.empty);
+        stub.setLayoutResource(R.layout.task_empty_stub);
 
         header = (TextView) mainListView.findViewById(R.id.header);
         header.setText(mainActivity.selectedProject.getString("projectName"));
 
         setHasOptionsMenu(true);
-        taskListAdapter = new TaskListAdapter(mContext, mainActivity.selectedProject);
+        taskListAdapter = new TaskListAdapter(mContext, mainActivity.selectedProject, "All");
         taskListAdapter.setAutoload(false);
         setListAdapter(taskListAdapter);
         taskListAdapter.addOnQueryLoadListener(this);
@@ -182,10 +186,27 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
                 filterBuilder.setTitle(R.string.action_filter)
                         .setItems(R.array.filters, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
+                                switch (which) {
+                                    case 0:
+                                        taskListAdapter = new TaskListAdapter(mContext,mainActivity.selectedProject, "All");
+                                        filter = false;
+                                        updateList(taskListAdapter);
+                                        break;
+                                    case 1:
+                                        taskListAdapter = new TaskListAdapter(mContext,mainActivity.selectedProject, "Active");
+                                        filter = true;
+                                        updateList(taskListAdapter);
+                                        break;
+                                    case 2:
+                                        taskListAdapter = new TaskListAdapter(mContext,mainActivity.selectedProject, "Completed");
+                                        filter = true;
+                                        updateList(taskListAdapter);
+                                        break;
+                                }
                             }
+
                         });
+
                 filterBuilder.create().show();
 
                 return true;
@@ -214,8 +235,20 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
     }
 
     @Override
-    public void onLoaded(List<ParseObject> parseObjects, Exception e) {
+    public void onLoaded(List list, Exception e) {
+        Log.i("onLoaded", "FIRED");
         updateHeader();
+        if (list.size() == 0 && filter) {
+            imageView = (ImageView) mainListView.findViewById(R.id.emptyTasks);
+            imageView.setBackgroundResource(R.drawable.no_data);
+
+            filter = false;
+        } else {
+            if (imageView != null && !filter) {
+                imageView.setBackgroundResource(R.drawable.empty_tasks);
+            }
+            filter = false;
+        }
     }
 
     @Override
@@ -282,6 +315,12 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
         transaction.add(android.R.id.content, newFragment).addToBackStack(null).commit();
         fragmentManager.executePendingTransactions();
 
+    }
+
+    void updateList(TaskListAdapter adapter) {
+        adapter.addOnQueryLoadListener(this);
+        getListView().setAdapter(adapter);
+        getListView().getEmptyView().setVisibility(ListView.GONE);
     }
 
     void updateHeader() {

@@ -41,12 +41,14 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener,
         ProjectsFragment.ProjectsFragmentListener, ProjectTaskFragment.ProjectTaskFragmentListener,
-        CreateTaskDialogFragment.CreateTaskDialogListener{
+        CreateTaskDialogFragment.CreateTaskDialogListener, MyTasksFragment.MyTaskFragmentListener{
 
     Context mContext;
 
     ActionBar actionBar;
     Spinner navSpinner;
+
+    Boolean appLaunchedStatus;
 
     String listHeaderValue;
 
@@ -56,12 +58,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     ProjectsFragment projectsFragment;
     ProjectTaskFragment projectTaskFragment;
 
+    MyTasksFragment myTasksFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mContext = this;
+
+        appLaunchedStatus = false;
 
         actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
@@ -109,12 +115,33 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (itemPosition == 0) {
-            Log.i("MAIN", "Projects Selected");
+        switch (itemPosition) {
 
-        } else {
-            Log.i("MAIN", "My Tasks Selected");
+            case 0:
+                if (appLaunchedStatus) {
+                    FragmentManager fragManager = getSupportFragmentManager();
+                    FragmentTransaction fragTrans = fragManager.beginTransaction();
+                    fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+
+                    projectsFragment = new ProjectsFragment();
+                    fragTrans.replace(R.id.main_container, projectsFragment).commit();
+
+                }
+                appLaunchedStatus = true;
+                break;
+
+            case 1:
+                Log.i("MAIN", "My Tasks Selected");
+                FragmentManager fragManager = getSupportFragmentManager();
+                FragmentTransaction fragTrans = fragManager.beginTransaction();
+                fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+                fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                myTasksFragment = new MyTasksFragment();
+                fragTrans.replace(R.id.main_container, myTasksFragment).commit();
+
+                break;
         }
+
         return false;
     }
 
@@ -132,7 +159,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         FragmentManager fragManager = getSupportFragmentManager();
         FragmentTransaction fragTrans = fragManager.beginTransaction();
         fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
-
+        fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         projectTaskFragment = new ProjectTaskFragment();
 
         fragTrans.replace(R.id.main_container, projectTaskFragment)
@@ -194,6 +221,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
             selectedProject.put("status", "Active");
             selectedProject.saveInBackground();
         }
+
+    }
+
+    @Override
+    public void onMyTaskSelected(ListView l, View v, int position) {
 
     }
 }

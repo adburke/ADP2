@@ -40,7 +40,7 @@ public class ProjectListAdapter extends ParseQueryAdapter<ParseObject> {
     public ProjectListAdapter(Context context, final String filter) {
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
-                if (filter.equals("all")) {
+                if (filter.equals("All")) {
                     ParseQuery query = new ParseQuery("project");
                     //query.whereEqualTo("createdBy", ParseUser.getCurrentUser());
                     Log.i("QUERY", "Query = " + query);

@@ -10,12 +10,10 @@
 
 package com.xecute.app;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -92,7 +90,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
         header.setText(R.string.projects);
 
         setHasOptionsMenu(true);
-        projectListAdapter = new ProjectListAdapter(mContext, "all");
+        projectListAdapter = new ProjectListAdapter(mContext, "All");
         projectListAdapter.setAutoload(false);
         projectListAdapter.addOnQueryLoadListener(this);
         setListAdapter(projectListAdapter);
@@ -172,7 +170,6 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
         inflater.inflate(R.menu.projects_menu, menu);
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -191,7 +188,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case 0:
-                                        projectListAdapter = new ProjectListAdapter(mContext, "all");
+                                        projectListAdapter = new ProjectListAdapter(mContext, "All");
                                         filter = false;
                                         updateList(projectListAdapter);
                                         break;
@@ -210,13 +207,6 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
 
                         });
 
-                filterBuilder.setOnDismissListener( new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        Log.i("DIALOG", "DISMISSED");
-
-                    }
-                });
 
                 filterBuilder.create().show();
 
@@ -336,7 +326,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                                             e1.printStackTrace();
                                         }
                                     } else {
-                                        dialog.dismiss();
+
                                         projectListAdapter.loadObjects();
 
                                     }
@@ -344,7 +334,7 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                             });
                         }
                     });
-
+                    dialog.dismiss();
                 }
             }
         });

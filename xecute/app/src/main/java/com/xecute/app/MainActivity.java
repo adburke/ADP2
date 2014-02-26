@@ -53,11 +53,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     String listHeaderValue;
 
     public ParseObject selectedProject;
+    public ParseObject selectedTask;
     String selectedColorStr;
 
     ProjectsFragment projectsFragment;
     ProjectTaskFragment projectTaskFragment;
-
+    TaskDetailFragment taskDetailFragment;
     MyTasksFragment myTasksFragment;
 
     @Override
@@ -159,7 +160,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         FragmentManager fragManager = getSupportFragmentManager();
         FragmentTransaction fragTrans = fragManager.beginTransaction();
         fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
-        fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         projectTaskFragment = new ProjectTaskFragment();
 
         fragTrans.replace(R.id.main_container, projectTaskFragment)
@@ -169,7 +169,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
     @Override
     public void onProjectTaskSelected(ListView l, View v, int position) {
+        Log.i("MAIN_ACTIVITY", "Selected Task at position: " + position);
+        selectedTask = (ParseObject) l.getItemAtPosition(position);
 
+        FragmentManager fragManager = getSupportFragmentManager();
+        FragmentTransaction fragTrans = fragManager.beginTransaction();
+        fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+        taskDetailFragment = new TaskDetailFragment();
+
+        fragTrans.replace(R.id.main_container, taskDetailFragment)
+                .addToBackStack(null).commit();
     }
 
     @Override
@@ -226,6 +235,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
     @Override
     public void onMyTaskSelected(ListView l, View v, int position) {
+        Log.i("MAIN_ACTIVITY", "Selected Task at position: " + position);
+        selectedTask = (ParseObject) l.getItemAtPosition(position);
 
+        FragmentManager fragManager = getSupportFragmentManager();
+        FragmentTransaction fragTrans = fragManager.beginTransaction();
+        fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+        taskDetailFragment = new TaskDetailFragment();
+
+        fragTrans.replace(R.id.main_container, taskDetailFragment)
+                .addToBackStack(null).commit();
     }
 }

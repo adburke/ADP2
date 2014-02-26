@@ -14,6 +14,12 @@
     <string name="tasks">Tasks</string>
     <string name="save">Save</string>
 
+    <!-- Task Detail -->
+    <string name="task">Task</string>
+    <string name="task_due_date">Due Date</string>
+    <string name="comments">Comments</string>
+
+
     <!-- New Task Dialog-->
     <string name="task_name_hint">Task Name</string>
     <string name="task_date_holder">Date Chosen</string>

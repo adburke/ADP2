@@ -103,7 +103,7 @@ public class TaskListAdapter extends ParseQueryAdapter<ParseObject> {
         TextView status = (TextView) v.findViewById(R.id.project_status);
         String percent = Integer.toString(object.getInt("percentCompleted"));
         status.setText(object.getInt(percent)+"%");
-        Log.i("QUERY", "status = " + object.getString("status"));
+        Log.i("QUERY", "status = " + object.getInt("status"));
 
         return v;
     }

@@ -18,6 +18,8 @@
     <string name="task">Task</string>
     <string name="task_due_date">Due Date</string>
     <string name="comments">Comments</string>
+    <string name="new_comment">New Comment</string>
+    <string name="new_comment_error">Comment cannot be blank!</string>
 
 
     <!-- New Task Dialog-->

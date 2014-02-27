@@ -36,8 +36,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
 import java.util.List;
@@ -86,7 +88,7 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
         stub.setLayoutResource(R.layout.task_empty_stub);
 
         header = (TextView) mainListView.findViewById(R.id.header);
-        header.setText(mainActivity.selectedProject.getString("projectName"));
+        header.setText(mainActivity.selectedProject.getString("Tasks of: " + "projectName"));
 
         setHasOptionsMenu(true);
         taskListAdapter = new TaskListAdapter(mContext, mainActivity.selectedProject, "All");
@@ -117,6 +119,7 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
                 }
                 itemPosition = position;
                 itemRow = view;
+                mainActivity.selectedTask = taskListAdapter.getItem(position);
                 // Start the CAB using the ActionMode.Callback defined above
                 mActionMode = getActivity().startActionMode(mActionModeCallback);
                 view.setSelected(true);
@@ -153,6 +156,12 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
                     removeRow(itemRow, itemPosition);
                     mode.finish(); // Action picked, so close the CAB
                     return true;
+
+                case R.id.item_edit:
+                    editTask();
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+
                 default:
                     return false;
             }
@@ -286,9 +295,20 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
                 row.getLayoutParams().height = initialHeight;
                 row.requestLayout();
 
-                ParseObject projectToDelete = taskListAdapter.getItem(position);
+                ParseObject taskToDelete = taskListAdapter.getItem(position);
 
-                projectToDelete.deleteInBackground(new DeleteCallback() {
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("comments");
+                query.whereEqualTo("relatedTask", taskToDelete);
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> parseObjects, ParseException e) {
+                        for (ParseObject object : parseObjects) {
+                            object.deleteInBackground();
+                        }
+                    }
+                });
+
+                taskToDelete.deleteInBackground(new DeleteCallback() {
                     public void done(ParseException e) {
                         if (e != null) {
                             Log.i("MAIN", "Error Deleting Project: " + e.getMessage());
@@ -306,7 +326,7 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
         row.startAnimation(animation);
     }
 
-    void createNewTask(){
+    void createNewTask() {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         CreateTaskDialogFragment newFragment = new CreateTaskDialogFragment();
 
@@ -315,6 +335,16 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
         transaction.add(android.R.id.content, newFragment).addToBackStack(null).commit();
         fragmentManager.executePendingTransactions();
 
+    }
+
+    void editTask() {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        EditTaskDialogFragment newFragment = new EditTaskDialogFragment();
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.add(android.R.id.content, newFragment).addToBackStack(null).commit();
+        fragmentManager.executePendingTransactions();
     }
 
     void updateList(TaskListAdapter adapter) {

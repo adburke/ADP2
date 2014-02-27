@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.parse.GetCallback;
@@ -86,8 +87,12 @@ public class TaskDetailFragment extends Fragment {
         commentList.addHeaderView(taskDetailLayout);
 
         int percentCompleted = selectedTask.getInt("percentCompleted");
+        if (percentCompleted == 100) {
+            taskProgressBar.setProgress(percentCompleted);
+        } else {
+            taskProgressBar.setProgress(percentCompleted+2);
+        }
         taskProgressBar.setMax(100);
-        taskProgressBar.setProgress(percentCompleted);
 
         taskName.setText(selectedTask.getString("taskName"));
 
@@ -126,6 +131,7 @@ public class TaskDetailFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_edit:
                 Log.i("MAIN", "Edit Task selected.");
+                changeTaskProgress();
                 return true;
             case R.id.action_comment:
                 Log.i("MAIN", "Comment on Task selected.");
@@ -207,5 +213,75 @@ public class TaskDetailFragment extends Fragment {
         });
 
     }
+
+    public void changeTaskProgress() {
+        AlertDialog.Builder projectBuilder = new AlertDialog.Builder(mContext);
+        projectBuilder.setTitle(R.string.edit_progress);
+
+        final int[] newProgress = new int[1];
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        final View view = inflater.inflate(R.layout.task_progress_edit, null);
+
+        SeekBar editProgressSeekBar = (SeekBar) view.findViewById(R.id.editTaskProgressBar);
+        editProgressSeekBar.setProgress(selectedTask.getInt("percentCompleted"));
+
+        projectBuilder.setView(view)
+                .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        final AlertDialog dialog = projectBuilder.create();
+        dialog.show();
+
+        editProgressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                newProgress[0] = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        //noinspection ConstantConditions
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int initialProgress = selectedTask.getInt("percentCompleted");
+                if (initialProgress != newProgress[0]) {
+                    if (newProgress[0] == 0) {
+                        taskProgressBar.setProgress(newProgress[0] + 2);
+                    } else {
+                        taskProgressBar.setProgress(newProgress[0]);
+                    }
+
+                    selectedTask.put("percentCompleted", newProgress[0]);
+                    selectedTask.saveInBackground();
+                }
+
+                dialog.dismiss();
+
+            }
+        });
+
+    }
+
+
 
 }

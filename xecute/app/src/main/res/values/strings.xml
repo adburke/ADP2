@@ -13,6 +13,11 @@
     <string name="projects">Projects</string>
     <string name="tasks">Tasks</string>
     <string name="save">Save</string>
+    <string name="demo">Demo mode limit of 3 projects.</string>
+    <string name="edit">Edit</string>
+
+    <!-- Edit Project -->
+    <string name="edit_project">Edit Project Name</string>
 
     <!-- Task Detail -->
     <string name="task">Task</string>
@@ -20,6 +25,7 @@
     <string name="comments">Comments</string>
     <string name="new_comment">New Comment</string>
     <string name="new_comment_error">Comment cannot be blank!</string>
+    <string name="edit_progress">Edit Progress</string>
 
 
     <!-- New Task Dialog-->

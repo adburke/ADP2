@@ -41,7 +41,8 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener,
         ProjectsFragment.ProjectsFragmentListener, ProjectTaskFragment.ProjectTaskFragmentListener,
-        CreateTaskDialogFragment.CreateTaskDialogListener, MyTasksFragment.MyTaskFragmentListener{
+        CreateTaskDialogFragment.CreateTaskDialogListener, MyTasksFragment.MyTaskFragmentListener,
+        EditTaskDialogFragment.EditTaskDialogListener{
 
     Context mContext;
 
@@ -245,5 +246,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
         fragTrans.replace(R.id.main_container, taskDetailFragment)
                 .addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onTaskEdit(ParseObject editedTask) {
+        editedTask.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                projectTaskFragment.taskListAdapter.loadObjects();
+            }
+        });
     }
 }

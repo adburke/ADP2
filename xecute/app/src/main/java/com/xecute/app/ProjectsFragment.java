@@ -37,6 +37,7 @@ import android.widget.TextView;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -153,6 +154,12 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                     removeRow(itemRow, itemPosition);
                     mode.finish(); // Action picked, so close the CAB
                     return true;
+
+                case R.id.item_edit:
+                    editProject();
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+
                 default:
                     return false;
             }
@@ -176,7 +183,20 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
         switch (item.getItemId()) {
             case R.id.action_add:
                 Log.i("MAIN", "New Project Selected.");
-                createNewProject();
+                if (projectListAdapter.getCount() == 3) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage(R.string.demo)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // FIRE ZE MISSILES!
+                                }
+                            });
+
+                    builder.create().show();
+                } else {
+                    createNewProject();
+                }
+
                 return true;
 
             case R.id.action_filter:
@@ -288,8 +308,6 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
             @Override
             public void onClick(View v)
             {
-                final Boolean[] wantToCloseDialog = {false};
-
                 final ParseObject[] projectColor = new ParseObject[1];
                 final ParseObject newProject;
 
@@ -306,6 +324,11 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
 
                     ParseUser user = ParseUser.getCurrentUser();
                     newProject.put("createdBy", user);
+
+                    ParseACL groupACl = new ParseACL();
+                    groupACl.setReadAccess(ParseUser.getCurrentUser(), true);
+                    groupACl.setWriteAccess(ParseUser.getCurrentUser(), true);
+                    newProject.setACL(groupACl);
 
                     ParseQuery<ParseObject> query = ParseQuery.getQuery("color");
                     query.whereEqualTo("useStatus", false);
@@ -339,6 +362,69 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
             }
         });
 
+    }
+
+    public void editProject() {
+        AlertDialog.Builder projectBuilder = new AlertDialog.Builder(mContext);
+        projectBuilder.setTitle(R.string.edit_project);
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        final View view = inflater.inflate(R.layout.create_project, null);
+
+        final ParseObject projectToEdit = projectListAdapter.getItem(itemPosition);
+        final EditText projectName = (EditText) view.findViewById(R.id.project_name);
+
+        projectName.setText(projectToEdit.getString("projectName"));
+
+        projectBuilder.setView(view)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        final AlertDialog dialog = projectBuilder.create();
+        dialog.show();
+
+        //noinspection ConstantConditions
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+
+                TextView errorMessage = (TextView) view.findViewById(R.id.project_name_error);
+                if (projectName.getText().toString().isEmpty()) {
+                    Log.i("Save Project", "Name is empty!");
+                    errorMessage.setVisibility(View.VISIBLE);
+
+                } else if (!projectToEdit.getString("projectName").equals(projectName.getText().toString())) {
+                    projectToEdit.put("projectName", projectName.getText().toString() );
+
+                    projectToEdit.saveInBackground(new SaveCallback() {
+                        public void done(ParseException e) {
+                            if (e != null) {
+                                Log.i("MAIN", "Error saving Project: " + e.getMessage());
+                                try {
+                                    projectToEdit.delete();
+                                } catch (ParseException e1) {
+                                    e1.printStackTrace();
+                                }
+                            } else {
+
+                                projectListAdapter.loadObjects();
+
+                            }
+                        }
+                    });
+                    dialog.dismiss();
+                }
+            }
+
+        });
     }
 
     public void removeRow(final View row, final int position) {
@@ -385,6 +471,18 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                     public void done(List<ParseObject> parseObjects, ParseException e) {
                         if (parseObjects != null || parseObjects.size() != 0) {
                             for (ParseObject object : parseObjects) {
+
+                                ParseQuery<ParseObject> query2 = ParseQuery.getQuery("comments");
+                                query2.whereEqualTo("relatedTask", object);
+                                query2.findInBackground(new FindCallback<ParseObject>() {
+                                    @Override
+                                    public void done(List<ParseObject> parseObjects, ParseException e) {
+                                        for (ParseObject object2 : parseObjects) {
+                                            object2.deleteInBackground();
+                                        }
+                                    }
+                                });
+
                                 object.deleteInBackground();
                             }
                         }

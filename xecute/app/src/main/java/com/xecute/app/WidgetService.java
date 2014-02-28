@@ -68,7 +68,7 @@ class WidgetRVFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        if (mWidgetItems != null) {
+        if (mWidgetItems != null && mWidgetItems.size() != 0) {
             return mWidgetItems.size();
         }
         return 4;
@@ -78,7 +78,7 @@ class WidgetRVFactory implements RemoteViewsService.RemoteViewsFactory {
     public RemoteViews getViewAt(int position) {
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.stack_item);
-        if (mWidgetItems != null) {
+        if (mWidgetItems != null && mWidgetItems.size() != 0) {
 
             String taskName = mWidgetItems.get(position).getString("taskName");
             if (taskName.length() > 28) {

@@ -151,7 +151,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
                 FragmentManager fragManager = getSupportFragmentManager();
                 FragmentTransaction fragTrans = fragManager.beginTransaction();
                 fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
-
+                fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 projectsFragment = new ProjectsFragment();
                 fragTrans.replace(R.id.main_container, projectsFragment).commit();
 

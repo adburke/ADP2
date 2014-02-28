@@ -108,8 +108,11 @@ public class TaskDetailFragment extends Fragment {
 
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         Date date = selectedTask.getDate("dueDate");
-        String dateStr = df.format(date);
-        dueDate.setText(dateStr);
+        if (date != null) {
+            String dateStr = df.format(date);
+            dueDate.setText(dateStr);
+        }
+
 
         taskDescription.setText(selectedTask.getString("taskDescription"));
 

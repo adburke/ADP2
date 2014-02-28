@@ -90,8 +90,11 @@ class WidgetRVFactory implements RemoteViewsService.RemoteViewsFactory {
 
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
             Date date = mWidgetItems.get(position).getDate("dueDate");
-            String dateStr = df.format(date);
-            rv.setTextViewText(R.id.stack_due_date, "DUE: " + dateStr);
+            if (date != null) {
+                String dateStr = df.format(date);
+                rv.setTextViewText(R.id.stack_due_date, "DUE: " + dateStr);
+            }
+
 
             String taskId = mWidgetItems.get(position).getObjectId();
             Bundle extras = new Bundle();

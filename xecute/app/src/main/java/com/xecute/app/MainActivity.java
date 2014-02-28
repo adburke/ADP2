@@ -98,6 +98,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
             }
         });
 
+
         Bundle incomingData = getIntent().getExtras();
         if (incomingData != null) {
             if (incomingData.getBoolean("widget")) {

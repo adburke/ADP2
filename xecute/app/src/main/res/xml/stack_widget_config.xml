@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Project:		Xecute
+  ~
+  ~ Package:		app
+  ~
+  ~ Author:		aaronburke
+  ~
+  ~ Date:		 	2 27, 2014
+  -->
+
+<!--
+  ~ Project:		Deals
+  ~
+  ~ Package:		Deals-Deals
+  ~
+  ~ Author:		aaronburke
+  ~
+  ~ Date:		 	1 22, 2014
+  -->
+
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="150dip"
+    android:minHeight="100dip"
+    android:updatePeriodMillis="3600000"
+    android:previewImage="@drawable/xecute_logo"
+    android:initialLayout="@layout/stack_layout"
+    android:autoAdvanceViewId="@id/stack_view"
+    android:resizeMode="horizontal|vertical">
+</appwidget-provider>

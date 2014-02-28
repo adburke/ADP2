@@ -11,6 +11,8 @@
 package com.xecute.app;
 
 import android.app.ActionBar;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -35,6 +38,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,6 +66,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     TaskDetailFragment taskDetailFragment;
     MyTasksFragment myTasksFragment;
 
+    public static List<ParseObject> taskItems;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,12 +86,39 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
                 android.R.layout.simple_spinner_dropdown_item);
         actionBar.setListNavigationCallbacks(mSpinnerAdapter, this);
 
-        FragmentManager fragManager = getSupportFragmentManager();
-        FragmentTransaction fragTrans = fragManager.beginTransaction();
-        fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+        taskItems = new ArrayList<ParseObject>();
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("task");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                taskItems = parseObjects;
+                if (e == null) {
 
-        projectsFragment = new ProjectsFragment();
-        fragTrans.add(R.id.main_container, projectsFragment).commit();
+                    taskItems = parseObjects;
+                    // Prompts the WidgetProvider to update the widget data set
+                    AppWidgetManager awm = AppWidgetManager.getInstance(mContext);
+                    awm.notifyAppWidgetViewDataChanged(awm.getAppWidgetIds(new ComponentName(mContext,
+                            WidgetProvider.class)), R.id.stack_view);
+                }
+            }
+        });
+
+        Bundle incomingData = getIntent().getExtras();
+        if (incomingData != null) {
+            if (incomingData.getBoolean("widget")) {
+                String taskId = getIntent().getStringExtra(WidgetProvider.EXTRA_ITEM);
+                Log.i("Widget TaskId", "taskId= " + taskId);
+                widgetTaskSelected(taskId);
+            }
+        } else {
+            FragmentManager fragManager = getSupportFragmentManager();
+            FragmentTransaction fragTrans = fragManager.beginTransaction();
+            fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+
+            projectsFragment = new ProjectsFragment();
+            fragTrans.add(R.id.main_container, projectsFragment).commit();
+
+        }
 
     }
 
@@ -223,6 +256,22 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
                     projectTaskFragment.taskListAdapter.loadObjects();
 
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("task");
+                    query.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> parseObjects, ParseException e) {
+                            taskItems = parseObjects;
+                            if (e == null) {
+
+                                taskItems = parseObjects;
+                                // Prompts the WidgetProvider to update the widget data set
+                                AppWidgetManager awm = AppWidgetManager.getInstance(mContext);
+                                awm.notifyAppWidgetViewDataChanged(awm.getAppWidgetIds(new ComponentName(mContext,
+                                        WidgetProvider.class)), R.id.stack_view);
+                            }
+                        }
+                    });
+
                 }
             }
         });
@@ -257,4 +306,26 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
             }
         });
     }
+
+    public void widgetTaskSelected(String taskId) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("task");
+        query.getInBackground(taskId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    selectedTask = object;
+                    FragmentManager fragManager = getSupportFragmentManager();
+                    FragmentTransaction fragTrans = fragManager.beginTransaction();
+                    fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+                    taskDetailFragment = new TaskDetailFragment();
+
+                    fragTrans.replace(R.id.main_container, taskDetailFragment)
+                            .addToBackStack(null).commit();
+                } else {
+                    // something went wrong
+                }
+            }
+        });
+
+    }
+
 }

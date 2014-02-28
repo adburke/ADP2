@@ -28,6 +28,22 @@
             android:windowSoftInputMode="adjustPan"
             android:name="com.xecute.app.MainActivity">
         </activity>
+
+        <!-- StackWidget Provider -->
+        <receiver android:name=".WidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/stack_widget_config" />
+        </receiver>
+
+        <!-- StackWidget Service -->
+        <service android:name=".WidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
     </application>
 
 </manifest>

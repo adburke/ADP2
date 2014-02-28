@@ -45,6 +45,7 @@
 
     <!-- Navigation Array -->
     <string-array name="action_list">
+        <item>Navigation</item>
         <item>Projects</item>
         <item>My Tasks</item>
     </string-array>

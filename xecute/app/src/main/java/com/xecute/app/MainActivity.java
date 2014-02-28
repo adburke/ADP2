@@ -38,7 +38,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,8 +51,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
     ActionBar actionBar;
     Spinner navSpinner;
-
-    Boolean appLaunchedStatus;
 
     String listHeaderValue;
 
@@ -74,8 +71,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         setContentView(R.layout.activity_main);
 
         mContext = this;
-
-        appLaunchedStatus = false;
 
         actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
@@ -152,27 +147,25 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         switch (itemPosition) {
 
-            case 0:
-                if (appLaunchedStatus) {
-                    FragmentManager fragManager = getSupportFragmentManager();
-                    FragmentTransaction fragTrans = fragManager.beginTransaction();
-                    fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
-
-                    projectsFragment = new ProjectsFragment();
-                    fragTrans.replace(R.id.main_container, projectsFragment).commit();
-
-                }
-                appLaunchedStatus = true;
-                break;
-
             case 1:
-                Log.i("MAIN", "My Tasks Selected");
                 FragmentManager fragManager = getSupportFragmentManager();
                 FragmentTransaction fragTrans = fragManager.beginTransaction();
                 fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
-                fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                projectsFragment = new ProjectsFragment();
+                fragTrans.replace(R.id.main_container, projectsFragment).commit();
+
+
+                break;
+
+            case 2:
+                Log.i("MAIN", "My Tasks Selected");
+                FragmentManager fragManager2 = getSupportFragmentManager();
+                FragmentTransaction fragTrans2 = fragManager2.beginTransaction();
+                fragTrans2.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
+                fragManager2.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 myTasksFragment = new MyTasksFragment();
-                fragTrans.replace(R.id.main_container, myTasksFragment).commit();
+                fragTrans2.replace(R.id.main_container, myTasksFragment).commit();
 
                 break;
         }
@@ -318,8 +311,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
                     fragTrans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.back_enter, R.anim.back_exit);
                     taskDetailFragment = new TaskDetailFragment();
 
-                    fragTrans.replace(R.id.main_container, taskDetailFragment)
-                            .addToBackStack(null).commit();
+                    fragTrans.add(R.id.main_container, taskDetailFragment).commit();
                 } else {
                     // something went wrong
                 }

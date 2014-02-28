@@ -84,7 +84,7 @@ public class TaskDetailFragment extends Fragment {
 
         commentList = (ListView) inflater.inflate(R.layout.comment_list,null);
 
-        commentList.addHeaderView(taskDetailLayout);
+        commentList.addHeaderView(taskDetailLayout, null, false);
 
         int percentCompleted = selectedTask.getInt("percentCompleted");
         if (percentCompleted == 100) {

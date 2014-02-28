@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import com.parse.CountCallback;
 import com.parse.LogInCallback;
 import com.parse.Parse;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -272,7 +273,14 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
                 if (e == null && count == 0) {
                     // The count request succeeded. Log the count
                     Log.i(LOGIN, "Color File Creation Started");
-                    int[] colorFiles = {R.drawable.color_icons_01,R.drawable.color_icons_02,R.drawable.color_icons_03};
+                    int[] colorFiles = {R.drawable.color_icons_01,R.drawable.color_icons_02,
+                            R.drawable.color_icons_03,R.drawable.color_icons_04,
+                            R.drawable.color_icons_05,R.drawable.color_icons_06,
+                            R.drawable.color_icons_07,R.drawable.color_icons_08,
+                            R.drawable.color_icons_09,R.drawable.color_icons_10,
+                            R.drawable.color_icons_11,R.drawable.color_icons_12,
+                            R.drawable.color_icons_13};
+
                     int arraySize = colorFiles.length;
                     for (int i = 0, j = arraySize; i < j; i++ ) {
                         Log.i("ColorCreation", "Color name= " + getResources().getResourceEntryName(colorFiles[i]));
@@ -311,6 +319,14 @@ public class LoginActivity extends FragmentActivity implements LoginFragment.Log
     private void addImageFileToColor(ParseFile colorImage) {
         ParseObject color = new ParseObject("color");
         color.put("colorImage", colorImage);
+        ParseACL groupACl = new ParseACL();
+
+        groupACl.setPublicWriteAccess(true);
+        groupACl.setPublicReadAccess(true);
+        color.setACL(groupACl);
+
+        color.put("useStatus", false);
+
         color.saveInBackground();
 
     }

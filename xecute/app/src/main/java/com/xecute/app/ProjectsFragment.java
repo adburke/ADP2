@@ -335,29 +335,26 @@ public class ProjectsFragment extends ListFragment implements ParseQueryAdapter.
                     query.getFirstInBackground( new GetCallback<ParseObject>() {
                         @Override
                         public void done(ParseObject parseObject, ParseException e) {
-                            if (parseObject != null || e == null) {
-                                newProject.put("color", parseObject);
-                                parseObject.put("useStatus", true);
-                                parseObject.saveInBackground();
+                            newProject.put("color", parseObject);
+                            parseObject.put("useStatus", true);
+                            parseObject.saveInBackground();
 
-                                newProject.saveInBackground(new SaveCallback() {
-                                    public void done(ParseException e) {
-                                        if (e != null) {
-                                            Log.i("MAIN", "Error saving Project: " + e.getMessage());
-                                            try {
-                                                newProject.delete();
-                                            } catch (ParseException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                        } else {
-
-                                            projectListAdapter.loadObjects();
-
+                            newProject.saveInBackground(new SaveCallback() {
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        Log.i("MAIN", "Error saving Project: " + e.getMessage());
+                                        try {
+                                            newProject.delete();
+                                        } catch (ParseException e1) {
+                                            e1.printStackTrace();
                                         }
-                                    }
-                                });
-                            }
+                                    } else {
 
+                                        projectListAdapter.loadObjects();
+
+                                    }
+                                }
+                            });
                         }
                     });
                     dialog.dismiss();

@@ -88,7 +88,7 @@ public class ProjectTaskFragment extends ListFragment implements ParseQueryAdapt
         stub.setLayoutResource(R.layout.task_empty_stub);
 
         header = (TextView) mainListView.findViewById(R.id.header);
-        header.setText(mainActivity.selectedProject.getString("Tasks of: " + "projectName"));
+        header.setText(mainActivity.selectedProject.getString("projectName"));
 
         setHasOptionsMenu(true);
         taskListAdapter = new TaskListAdapter(mContext, mainActivity.selectedProject, "All");
